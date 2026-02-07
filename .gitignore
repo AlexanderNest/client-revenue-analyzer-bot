@@ -30,3 +30,5 @@ bin/
 
 /src/main/resources/application-local.properties
 /client-revenue-analyzer-bot.iml
+/target/
+/.idea/
