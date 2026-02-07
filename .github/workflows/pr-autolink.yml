@@ -1,0 +1,59 @@
+name: Link PR to Issue by Title
+
+on:
+  pull_request:
+    types: [opened, edited]
+
+jobs:
+  link_pr_to_issue:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup GH CLI
+        run: |
+          echo "$HOME/.gh/bin" >> $GITHUB_PATH
+          gh config set git_protocol https
+
+      - name: Extract issue number from PR title
+        id: extract
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          ISSUE_REF=$(echo "$PR_TITLE" | grep -oE '#([0-9]+)' | head -n1)
+          
+          if [[ -n "$ISSUE_REF" ]]; then
+            echo "issue_ref=$ISSUE_REF" >> $GITHUB_OUTPUT
+          else
+            echo "No issue reference found in PR title"
+            exit 0
+          fi
+
+      - name: Check if issue already linked in PR body
+        id: check
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          ISSUE_REF=${{ steps.extract.outputs.issue_ref }}
+          
+          if [[ "$PR_BODY" == *"$ISSUE_REF"* ]]; then
+            echo "Issue already linked in PR body"
+            exit 0
+          else
+            echo "issue_ref=$ISSUE_REF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update PR body with issue reference
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_REF=${{ steps.check.outputs.issue_ref }}
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          CURRENT_BODY=$(gh pr view "$PR_NUMBER" --json body -q '.body')
+          if [[ -n "$ISSUE_REF" ]]; then
+            NEW_BODY="${CURRENT_BODY} closes ${ISSUE_REF}"
+            gh pr edit "$PR_NUMBER" --body "$NEW_BODY"
+          fi
