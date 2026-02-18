@@ -36,17 +36,20 @@ public class HandlersService {
 
     private final List<CommandHandler> commandHandlers;
 
+    private final MetricService meterService;
+
     public HandlersService(List<CommandHandler> commandHandlers,
                            List<StatefulCommandHandler<?, ?>> statefulCommandHandlers,
                            UndefinedHandler undefinedHandler,
                            CreateUserHandler createUserHandler, ClientRevenueAnalyzerIntegrationClient integrationClient,
-                           List<InvocableCommandHandler> invocableCommandHandlers) {
+                           List<InvocableCommandHandler> invocableCommandHandlers, MetricService meterService) {
         this.commandHandlers = commandHandlers;
         this.statefulCommandHandlers = statefulCommandHandlers;
         this.integrationClient = integrationClient;
         this.invocableCommandHandlers = invocableCommandHandlers;
         this.undefinedHandler = undefinedHandler;
         this.createUserHandler = createUserHandler;
+        this.meterService = meterService;
 
         highestPriorityCommandHandlers = commandHandlers.stream()
                 .filter(ch -> ch.getPriority() == Priority.HIGHEST)
@@ -96,7 +99,7 @@ public class HandlersService {
             return started;
         }
 
-        return Stream.of(highestPriorityCommandHandlers, normalPriorityCommandHandlers, lowestPriorityCommandHandlers)
+        CommandHandler commandHandler = Stream.of(highestPriorityCommandHandlers, normalPriorityCommandHandlers, lowestPriorityCommandHandlers)
                 .map(handlers -> selectHandler(handlers, update))
                 .filter(Objects::nonNull)
                 .findFirst()
@@ -104,6 +107,9 @@ public class HandlersService {
                     log.warn("Не удалось найти Handler для этого Update [{}]", update);
                     return undefinedHandler;
                 });
+
+        meterService.countHandlerMetric(commandHandler);
+        return commandHandler;
     }
 
     private boolean isUnregisteredUser(Update update) {
