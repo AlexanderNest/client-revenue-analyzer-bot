@@ -1,9 +1,6 @@
 package ru.nesterov.bot;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -18,32 +15,35 @@ import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 @Service
 @Slf4j
 public class RevenueAnalyzerBot extends TelegramLongPollingBot {
     private final HandlersService handlersService;
     private final BotProperties botProperties;
-    private final TaskExecutor taskExecutor;
+    private final ExecutorService executorService;
     private final UpdateUserControlButtonsHandler updateUserControlButtonsHandler;
 
 
     public RevenueAnalyzerBot(BotProperties botProperties, HandlersService handlersService,
-                              @Qualifier("applicationTaskExecutor") TaskExecutor taskExecutor,
+                              ExecutorService executorService,
                               UpdateUserControlButtonsHandler updateUserControlButtonsHandler) {
         super(botProperties.getApiToken());
+
         this.handlersService = handlersService;
         this.botProperties = botProperties;
-        this.taskExecutor = taskExecutor;
+        this.executorService = executorService;
         this.updateUserControlButtonsHandler = updateUserControlButtonsHandler;
     }
 
     @Override
     public void onUpdateReceived(Update update) {
-        taskExecutor.execute(() -> handleUpdate(update));
+        executorService.execute(() -> handleUpdate(update));
     }
 
     public void handleUpdate(Update update) {
+        log.debug("Получен update с содержимым: {}", update);
 
         long chatId = TelegramUpdateUtils.getChatId(update);
 
@@ -93,7 +93,9 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
     private void sendMessage(List<BotApiMethod<?>> sendMessages) {
         for (BotApiMethod<?> message : sendMessages) {
             try {
+                log.debug("Отправка сообщения с содержимым: {}", message);
                 execute(message);
+                log.debug("Отправлено");
             } catch (TelegramApiException e) {
                 log.error("Ошибка отправки сообщения", e);
             }
