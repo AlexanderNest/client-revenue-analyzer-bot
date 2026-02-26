@@ -152,12 +152,6 @@ public class ClientRevenueAnalyzerIntegrationClient {
 
         return response.getBody();
 
-//        return postForList(
-//                String.valueOf(userId),
-//                request,
-//                "/revenue-analyzer/client/getSchedule",
-//                new ParameterizedTypeReference<>() {}
-//        );
     }
 
     public List<GetActiveClientResponse> getActiveClients(long userId) {
