@@ -7,11 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -22,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import ru.nesterov.bot.config.BotProperties;
 import ru.nesterov.bot.config.RevenueAnalyzerProperties;
 import ru.nesterov.bot.dto.AiAnalyzerResponse;
+import ru.nesterov.bot.dto.ClientAllScheduleResponse;
 import ru.nesterov.bot.dto.CreateClientRequest;
 import ru.nesterov.bot.dto.CreateClientResponse;
 import ru.nesterov.bot.dto.CreateUserRequest;
@@ -120,7 +117,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
             }
 
             throw new UserFriendlyException(
-                    String.format("Непредвиденный ответ от сервера: %d", response.getStatusCode().value())
+                    String.format("Непредвиденный ответ от сервера: %d", response.getStatusCodeValue())
             );
         } catch (HttpClientErrorException.Conflict ex) {
             String body = ex.getResponseBodyAsString();
@@ -140,18 +137,27 @@ public class ClientRevenueAnalyzerIntegrationClient {
         return responseEntity.getBody();
     }
 
-    public List<GetClientScheduleResponse> getClientSchedule(long userId, String clientName, LocalDateTime leftDate, LocalDateTime rightDate) {
+    public ClientAllScheduleResponse getClientSchedule(long userId, String clientName, LocalDateTime leftDate, LocalDateTime rightDate) {
         GetForClientScheduleRequest request = new GetForClientScheduleRequest();
         request.setClientName(clientName);
         request.setLeftDate(leftDate);
         request.setRightDate(rightDate);
 
-        return postForList(
+        ResponseEntity<ClientAllScheduleResponse> response = post(
                 String.valueOf(userId),
                 request,
                 "/revenue-analyzer/client/getSchedule",
-                new ParameterizedTypeReference<>() {}
+                ClientAllScheduleResponse.class
         );
+
+        return response.getBody();
+
+//        return postForList(
+//                String.valueOf(userId),
+//                request,
+//                "/revenue-analyzer/client/getSchedule",
+//                new ParameterizedTypeReference<>() {}
+//        );
     }
 
     public List<GetActiveClientResponse> getActiveClients(long userId) {
@@ -251,7 +257,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
     private <T> ResponseEntity<T> exchange(String username, MultiValueMap<String, String> requestParams, Object request, String endpoint, Class<T> responseType, HttpMethod httpMethod) {
         HttpEntity<Object> entity = new HttpEntity<>(request, createHeaders(username));
 
-        URI uri = UriComponentsBuilder.fromUriString(revenueAnalyzerProperties.getUrl() + endpoint)
+        URI uri = UriComponentsBuilder.fromHttpUrl(revenueAnalyzerProperties.getUrl() + endpoint)
                 .queryParams(requestParams)
                 .build()
                 .encode()
