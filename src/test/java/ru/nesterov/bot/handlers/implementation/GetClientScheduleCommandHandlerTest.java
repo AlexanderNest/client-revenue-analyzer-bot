@@ -16,6 +16,7 @@ import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.nesterov.bot.dto.ClientAllScheduleResponse;
 import ru.nesterov.bot.dto.GetActiveClientResponse;
 import ru.nesterov.bot.dto.GetClientScheduleResponse;
 import ru.nesterov.bot.handlers.RegisteredUserHandlerTest;
@@ -202,12 +203,16 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
 
         LocalDate secondDate = firstDate.plusMonths(1L);
 
+        ClientAllScheduleResponse mockResponse = new ClientAllScheduleResponse();
+        mockResponse.setClientName("Клиент 1");
+        mockResponse.setEvents(clientSchedule);
+
         when(client.getClientSchedule(
                 1L,
                 "Клиент 1",
                 firstDate.atStartOfDay(),
                 secondDate.atStartOfDay().plusDays(1)
-        )).thenReturn(clientSchedule);
+        )).thenReturn(mockResponse);
 
         Update updateWithSecondDate = createUpdateWithCallbackQuery(String.valueOf(secondDate));
         List<BotApiMethod<?>> botApiMethod = handler.handle(updateWithSecondDate);
@@ -239,7 +244,8 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
                         LocalDateTime.now().plusDays(2).plusHours(1).format(timeFormatter)
                 )
         );
-        assertEquals(expectedText, editMessage.getText());
+        String expectedFullText = String.format("%s\n\n%s", "Клиент 1", expectedText);
+        assertEquals(expectedFullText, editMessage.getText());
     }
 
     @Test

@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.nesterov.bot.dto.ClientAllScheduleResponse;
 import ru.nesterov.bot.dto.GetClientScheduleRequest;
 import ru.nesterov.bot.dto.GetClientScheduleResponse;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
@@ -93,7 +94,7 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
 
     @SneakyThrows
     private List<BotApiMethod<?>> sendClientSchedule(Update update) {
-        List<GetClientScheduleResponse> response = client.getClientSchedule(
+        ClientAllScheduleResponse response = client.getClientSchedule(
                 TelegramUpdateUtils.getUserId(update),
                 getStateMachine(update).getMemory().getClientName(),
                 getStateMachine(update).getMemory().getFirstDate().atStartOfDay(),
@@ -104,15 +105,19 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
                 formatClientSchedule(response), null);
     }
 
-    private String formatClientSchedule(List<GetClientScheduleResponse> response) {
+    private String formatClientSchedule(ClientAllScheduleResponse response) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.forLanguageTag("ru"));
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"));
 
-        if (response.isEmpty()) {
-            return "📅 Встречи не запланированы";
+        String clientName = response.getClientName() != null ? response.getClientName() : "Клиент";
+
+        List<GetClientScheduleResponse> events = response.getEvents();
+
+        if (events == null || events.isEmpty()) {
+            return String.format("%s\n\n 📅 Встречи не запланированы", clientName);
         }
 
-        return response.stream()
+        String eventsInfo = events.stream()
                 .map(schedule -> {
                     String startDate = schedule.getEventStart().format(dateFormatter);
                     String startTime = schedule.getEventStart().format(timeFormatter);
@@ -124,7 +129,27 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
                             startDate, startTime, endTime, requiresShiftInfo);
                 })
                 .collect(Collectors.joining("\n\n"));
-    }
+        return String.format("%s\n\n%s", clientName, eventsInfo);
+                }
+
+
+//        if (response.isEmpty()) {
+//            return "📅 Встречи не запланированы";
+//        }
+//
+//        return response.stream()
+//                .map(schedule -> {
+//                    String startDate = schedule.getEventStart().format(dateFormatter);
+//                    String startTime = schedule.getEventStart().format(timeFormatter);
+//                    String endTime = schedule.getEventEnd().format(timeFormatter);
+//                    String requiresShiftInfo = schedule.isRequiresShift() ? "\n⚠️ Требуется перенос" : "";
+//
+//                    return String.format(
+//                            "📅 Дата: %s\n⏰ Время: %s - %s%s",
+//                            startDate, startTime, endTime, requiresShiftInfo);
+//                })
+//                .collect(Collectors.joining("\n\n"));
+//    }
 
     @SneakyThrows
     private List<BotApiMethod<?>> handleCallbackPrev(Update update) {
