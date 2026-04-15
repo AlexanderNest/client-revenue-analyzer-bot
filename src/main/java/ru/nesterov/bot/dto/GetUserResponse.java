@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetUserResponse {
+public class GetUserResponse implements Serializable {
     private long userId;
     private String username;
     private String mainCalendarId;

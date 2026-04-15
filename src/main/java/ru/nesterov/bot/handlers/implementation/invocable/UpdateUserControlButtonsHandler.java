@@ -51,7 +51,6 @@ public class UpdateUserControlButtonsHandler extends InvocableCommandHandler {
         int buttonsPerLine = botProperties.getMenuButtonsPerLine();
 
         List<KeyboardRow> keyboardRows = buildKeyboardRows(update, buttonsPerLine);
-
         keyboardMarkup.setKeyboard(keyboardRows);
         return getReplyKeyboard(TelegramUpdateUtils.getChatId(update), UPDATE_MESSAGE, keyboardMarkup);
     }
