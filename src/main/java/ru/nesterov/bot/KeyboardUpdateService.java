@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class KeyboardUpdateService {
-    private static final String KEY_PREFIX = "keyboard:last-update:";
+    private static final String KEY_PREFIX = "keyboard:last-update:%s";
 
     private final StringRedisTemplate redisTemplate;
     private final BotProperties botProperties;
@@ -35,17 +35,17 @@ public class KeyboardUpdateService {
 
     private boolean shouldUpdateKeyboard(Long chatId) {
 
-        if (!botProperties.isAutoUpdate()) {
+        if (!botProperties.isControlButtonsAutoUpdateEnabled()) {
             return true;
         }
 
-        String key = KEY_PREFIX + chatId;
+        String key = KEY_PREFIX.formatted(chatId);
 
         if (redisTemplate.hasKey(key)) {
             return false;
         }
 
-        redisTemplate.opsForValue().set(key, LocalDateTime.now().toString(), botProperties.getButtonsUpdateIntervalHours(), TimeUnit.HOURS);
+        redisTemplate.opsForValue().set(key, LocalDateTime.now().toString(), botProperties.getControlButtonsUpdateIntervalHours(), TimeUnit.HOURS);
         return true;
     }
 }

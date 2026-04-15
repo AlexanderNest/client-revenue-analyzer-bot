@@ -12,7 +12,7 @@ public class BotProperties {
     private String username;
     private String secretToken;
     private Integer menuButtonsPerLine;
-    private boolean autoUpdate;
-    private long ButtonsUpdateIntervalHours;
-
+    private boolean controlButtonsAutoUpdateEnabled;
+    private long controlButtonsUpdateIntervalHours;
 }
+
