@@ -23,18 +23,21 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
     private final HandlersService handlersService;
     private final BotProperties botProperties;
     private final ExecutorService executorService;
+    private final KeyboardUpdateService keyboardUpdateService;
     private final UpdateUserControlButtonsHandler updateUserControlButtonsHandler;
 
 
     public RevenueAnalyzerBot(BotProperties botProperties, HandlersService handlersService,
                               ExecutorService executorService,
-                              UpdateUserControlButtonsHandler updateUserControlButtonsHandler) {
+                              UpdateUserControlButtonsHandler updateUserControlButtonsHandler,
+                              KeyboardUpdateService keyboardUpdateService) {
         super(botProperties.getApiToken());
 
         this.handlersService = handlersService;
         this.botProperties = botProperties;
         this.executorService = executorService;
         this.updateUserControlButtonsHandler = updateUserControlButtonsHandler;
+        this.keyboardUpdateService = keyboardUpdateService;
     }
 
     @Override
@@ -66,13 +69,13 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
             handlersService.resetFinishedHandlers(chatId);
         }
 
-//        sendMessages = enrichWithCommandButtons(sendMessages, update);
+        sendMessages = enrichWithCommandButtons(sendMessages, update);
         sendMessage(sendMessages);
     }
 
     private List<BotApiMethod<?>> enrichWithCommandButtons(List<BotApiMethod<?>> sendMessages, Update update) {
         List<BotApiMethod<?>> mutableList = new ArrayList<>(sendMessages);
-        mutableList.addAll(updateUserControlButtonsHandler.handle(update));
+        mutableList.addAll(keyboardUpdateService.getUpdateKeyboard(update));
 
         return mutableList;
     }
