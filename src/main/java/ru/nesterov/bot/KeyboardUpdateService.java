@@ -35,7 +35,7 @@ public class KeyboardUpdateService {
 
     private boolean shouldUpdateKeyboard(Long chatId) {
 
-        if (!botProperties.isControlButtonsAutoUpdateEnabled()) {
+        if (botProperties.isControlButtonsAutoUpdateEnabled()) {
             return true;
         }
 
