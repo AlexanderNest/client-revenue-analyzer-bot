@@ -127,10 +127,10 @@ class GetMonthStatisticsHandlerTestTest extends RegisteredUserHandlerTest {
         assertEquals(3, thirdQuarter.size());
         assertEquals(3, fourthQuarter.size());
 
-        assertTrue(containsAllButtonsByTextWithMarkChecking(firstQuarter, List.of("Январь", "Февраль", "Март")));
-        assertTrue(containsAllButtonsByTextWithMarkChecking(secondQuarter, List.of("Апрель", "Май", "Июнь")));
-        assertTrue(containsAllButtonsByTextWithMarkChecking(thirdQuarter, List.of("Июль", "Август", "Сентябрь")));
-        assertTrue(containsAllButtonsByTextWithMarkChecking(fourthQuarter, List.of("Октябрь", "Ноябрь", "Декабрь")));
+        assertTrue(containsAllButtonsByTextWithMarkChecking(firstQuarter, List.of("январь", "февраль", "март")));
+        assertTrue(containsAllButtonsByTextWithMarkChecking(secondQuarter, List.of("апрель", "май", "июнь")));
+        assertTrue(containsAllButtonsByTextWithMarkChecking(thirdQuarter, List.of("июль", "август", "сентябрь")));
+        assertTrue(containsAllButtonsByTextWithMarkChecking(fourthQuarter, List.of("октябрь", "ноябрь", "декабрь")));
     }
 
     private boolean containsAllButtonsByTextWithMarkChecking(List<InlineKeyboardButton> buttons, List<String> texts) {

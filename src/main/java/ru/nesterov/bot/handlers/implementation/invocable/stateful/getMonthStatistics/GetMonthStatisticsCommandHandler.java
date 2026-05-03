@@ -12,12 +12,13 @@ import ru.nesterov.bot.dto.GetIncomeAnalysisForMonthResponse;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
 import ru.nesterov.bot.statemachine.dto.Action;
-import ru.nesterov.bot.utils.MonthUtil;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
 import java.text.NumberFormat;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,13 +27,8 @@ import java.util.Locale;
  */
 @Component
 public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<State, MonthRequest> {
-    private static final String[] months = {
-            "Январь", "Февраль",
-            "Март", "Апрель", "Май",
-            "Июнь", "Июль", "Август",
-            "Сентябрь", "Октябрь", "Ноябрь",
-            "Декабрь"
-    };
+
+    private static final Calendar CALENDAR = Calendar.getInstance();
 
     private static final String markSymbol = "\u2B50";
 
@@ -75,7 +71,7 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
         CallbackQuery callbackQuery = update.getCallbackQuery();
         ButtonCallback callback = objectMapper.readValue(callbackQuery.getData(), ButtonCallback.class);
 
-        GetIncomeAnalysisForMonthResponse response = client.getIncomeAnalysisForMonth(userId, clearFromMark(callback.getValue()));
+        GetIncomeAnalysisForMonthResponse response = client.getIncomeAnalysisForMonth(userId, callback.getValue());
 
         return editMessage(
                 callbackQuery.getMessage().getChatId(),
@@ -91,41 +87,36 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
         message.setChatId(String.valueOf(TelegramUpdateUtils.getChatId(update)));
         message.setText("Выберите месяц для анализа дохода:");
 
-        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
-
-        String[] monthsWithMark = getArrayWithCurrentMonthMark();
-        for (int i = 0; i < monthsWithMark.length; i += 3) {
-            List<InlineKeyboardButton> row = new ArrayList<>();
-            for (int j = i; j < i + 3 && j < monthsWithMark.length; j++) {
-                InlineKeyboardButton button = new InlineKeyboardButton();
-                button.setText(monthsWithMark[j]);
-                ButtonCallback callback = new ButtonCallback();
-                callback.setValue(clearFromMark(monthsWithMark[j]));
-                callback.setCommand(getCommand());
-                button.setCallbackData(objectMapper.writeValueAsString(callback));
-                row.add(button);
-            }
-            keyboard.add(row);
+        List<InlineKeyboardButton> buttons = new ArrayList<>();
+        for (Month month : Month.values()) {
+            InlineKeyboardButton button = new InlineKeyboardButton();
+            button.setText(getLocalizedMonthAndMarkCurrent(month));
+            ButtonCallback callback = new ButtonCallback();
+            callback.setValue(month.name());
+            callback.setCommand(getCommand());
+            button.setCallbackData(objectMapper.writeValueAsString(callback));
+            buttons.add(button);
         }
 
-        keyboardMarkup.setKeyboard(keyboard);
+        InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
+        keyboardMarkup.setKeyboard(splitList(buttons));
         message.setReplyMarkup(keyboardMarkup);
 
         return List.of(message);
     }
 
-    private String clearFromMark(String string) {
-        return string.replace(markSymbol, "");
+    private String getLocalizedMonthAndMarkCurrent(Month month) {
+        final int monthNumber = CALENDAR.get(Calendar.MONTH) + 1;
+        String localizedMonth = month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.of("ru"));
+        return month.getValue() == monthNumber ? markSymbol + " " + localizedMonth : localizedMonth;
     }
 
-    private String[] getArrayWithCurrentMonthMark() {
-        String[] copy = Arrays.copyOf(months, months.length);
-
-        int currentMonth = MonthUtil.getCurrentMonth();
-        copy[currentMonth] = markSymbol + copy[currentMonth];
-
-        return copy;
+    private <T> List<List<T>> splitList(List<T> list) {
+        List<List<T>> lists = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += 3) {
+            lists.add(list.subList(i, Math.min(list.size(), i + 3)));
+        }
+        return lists;
     }
 
     @Override
