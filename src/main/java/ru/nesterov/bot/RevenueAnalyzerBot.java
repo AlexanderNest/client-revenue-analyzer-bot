@@ -11,6 +11,7 @@ import ru.nesterov.bot.config.BotProperties;
 import ru.nesterov.bot.handlers.abstractions.CommandHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.UpdateUserControlButtonsHandler;
 import ru.nesterov.bot.handlers.service.HandlersService;
+import ru.nesterov.bot.service.MessageSenderService;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
 import java.util.ArrayList;
@@ -25,12 +26,15 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
     private final ExecutorService executorService;
     private final KeyboardUpdateService keyboardUpdateService;
     private final UpdateUserControlButtonsHandler updateUserControlButtonsHandler;
+    private final MessageSenderService messageSenderService;
 
 
     public RevenueAnalyzerBot(BotProperties botProperties, HandlersService handlersService,
                               ExecutorService executorService,
                               UpdateUserControlButtonsHandler updateUserControlButtonsHandler,
-                              KeyboardUpdateService keyboardUpdateService) {
+                              KeyboardUpdateService keyboardUpdateService,
+                              MessageSenderService messageSenderService
+    ) {
         super(botProperties.getApiToken());
 
         this.handlersService = handlersService;
@@ -38,6 +42,7 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         this.executorService = executorService;
         this.updateUserControlButtonsHandler = updateUserControlButtonsHandler;
         this.keyboardUpdateService = keyboardUpdateService;
+        this.messageSenderService = messageSenderService;
     }
 
     @Override
@@ -70,7 +75,11 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         }
 
         sendMessages = enrichWithCommandButtons(sendMessages, update);
-        sendMessage(sendMessages);
+        try {
+            messageSenderService.sendMessage(this, sendMessages);
+        } catch (TelegramApiException e) {
+            log.error("Ошибка отправки сообщения", e);
+        }
     }
 
     private List<BotApiMethod<?>> enrichWithCommandButtons(List<BotApiMethod<?>> sendMessages, Update update) {
@@ -91,17 +100,5 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         message.setText(text);
 
         return List.of(message);
-    }
-
-    private void sendMessage(List<BotApiMethod<?>> sendMessages) {
-        for (BotApiMethod<?> message : sendMessages) {
-            try {
-                log.debug("Отправка сообщения с содержимым: {}", message);
-                execute(message);
-                log.debug("Отправлено");
-            } catch (TelegramApiException e) {
-                log.error("Ошибка отправки сообщения", e);
-            }
-        }
     }
 }
