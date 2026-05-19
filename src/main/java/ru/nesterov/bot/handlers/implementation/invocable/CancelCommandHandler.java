@@ -35,4 +35,9 @@ public class CancelCommandHandler extends InvocableCommandHandler {
     public String getCommand() {
         return "/cancel";
     }
+
+    @Override
+    public String getDescription() {
+        return "Сбрасывает текущее состояние бота";
+    }
 }

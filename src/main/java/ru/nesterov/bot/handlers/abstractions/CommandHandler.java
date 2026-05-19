@@ -25,4 +25,12 @@ public interface CommandHandler {
     default Priority getPriority() {
         return Priority.NORMAL;
     }
+
+    /**
+     * краткое описание функционала обработчика для формирования справки пользователю
+     */
+    default String getDescription() {
+        return "";
+    }
+
 }
