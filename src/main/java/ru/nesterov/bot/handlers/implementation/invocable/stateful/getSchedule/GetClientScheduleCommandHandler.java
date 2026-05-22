@@ -192,4 +192,9 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
     public String getCommand() {
         return "Узнать расписание клиента";
     }
+
+    @Override
+    public String getDescription() {
+        return "Посмотреть расписание встреч для выбранного клиента";
+    }
 }

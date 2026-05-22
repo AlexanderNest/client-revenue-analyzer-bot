@@ -103,5 +103,10 @@ public class CreateClientHandler extends StatefulCommandHandler<State, CreateCli
 
         return buttonCallback.getValue();
     }
+
+    @Override
+    public String getDescription() {
+        return "Создание нового пользователя";
+    }
 }
 

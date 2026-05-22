@@ -15,7 +15,7 @@ import java.util.List;
 public class AiAnalyzerHandler extends InvocableCommandHandler {
     @Override
     public String getCommand() {
-        return "Анализ клиентов ИИ";
+        return "Анализ доходов";
     }
 
     @Override

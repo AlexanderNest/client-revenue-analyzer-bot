@@ -17,6 +17,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <telegrambots.version>6.9.7.1</telegrambots.version>
+        <commons-text.version>1.14.0</commons-text.version>
     </properties>
 
     <dependencies>
@@ -59,7 +60,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.14.0</version>
+            <version>${commons-text.version}</version>
         </dependency>
     </dependencies>
     <build>

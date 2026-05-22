@@ -46,6 +46,11 @@ public class UpdateUserControlButtonsHandler extends InvocableCommandHandler {
     }
 
     @Override
+    public String getDescription() {
+        return "Обновление кнопок управления";
+    }
+
+    @Override
     public List<BotApiMethod<?>> handle(Update update) {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);

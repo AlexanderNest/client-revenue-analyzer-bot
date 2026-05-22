@@ -14,5 +14,6 @@ public class BotProperties {
     private Integer menuButtonsPerLine;
     private boolean controlButtonsAutoUpdateEnabled;
     private long controlButtonsUpdateIntervalHours;
+    private String creatorContact;
 }
 

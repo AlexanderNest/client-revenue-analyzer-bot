@@ -19,6 +19,12 @@ public class UserOperationGroupHandler extends GroupingCommandHandler {
         return "Действия пользователя";
     }
 
+
+    @Override
+    public String getDescription() {
+        return "Сервисные действия пользователя и бизнес статистика за год";
+    }
+
     @Override
     public int getOrder() {
         return 3;

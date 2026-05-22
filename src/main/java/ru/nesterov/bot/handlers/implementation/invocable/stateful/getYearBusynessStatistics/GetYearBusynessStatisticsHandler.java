@@ -86,5 +86,10 @@ public class GetYearBusynessStatisticsHandler extends StatefulCommandHandler<Sta
     public String getCommand() {
         return "Анализ занятости за год";
     }
+
+    @Override
+    public String getDescription() {
+        return "Получение годового отчета за указанный год";
+    }
 }
 

@@ -120,4 +120,9 @@ public class CreateUserHandler extends StatefulCommandHandler<State, CreateUserR
     public int getOrder() {
         return 10;
     }
+
+    @Override
+    public String getDescription() {
+        return "Создание нового клиента для зарегистрированного пользователя";
+    }
 }

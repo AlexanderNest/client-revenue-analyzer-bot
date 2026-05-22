@@ -15,14 +15,12 @@ public class ClientInfoOperationGroupHandler extends GroupingCommandHandler {
     protected ClientInfoOperationGroupHandler(AiAnalyzerHandler aiAnalyzerHandler,
                                               GetActiveClientsHandler getActiveClientsHandler,
                                               GetClientStatisticHandler getClientStatisticHandler,
-                                              GetClientScheduleCommandHandler getClientScheduleCommandHandler,
-                                              HelpCommandHandler helpCommandHendler) {
+                                              GetClientScheduleCommandHandler getClientScheduleCommandHandler) {
         super(List.of(
                         aiAnalyzerHandler,
                         getActiveClientsHandler,
                         getClientStatisticHandler,
-                        getClientScheduleCommandHandler,
-                        helpCommandHendler
+                        getClientScheduleCommandHandler
                 )
         );
     }
