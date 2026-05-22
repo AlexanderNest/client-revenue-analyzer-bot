@@ -12,11 +12,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.config.BotProperties;
 import ru.nesterov.bot.exception.UserFriendlyException;
-import ru.nesterov.bot.handlers.abstractions.GroupingCommandHandler;
+import ru.nesterov.bot.handlers.abstractions.CommandHandler;
 import ru.nesterov.bot.handlers.abstractions.InvocableCommandHandler;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -24,29 +25,28 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class HelpCommandHandler extends GroupingCommandHandler {
+public class BotInstructionsCommandHandler extends InvocableCommandHandler {
     private static final String COMMANDS_PLACEHOLDER = "commands";
     private static final String CANCEL_COMMAND_PLACEHOLDER = "cancel_command";
     private static final String CREATOR_CONTACT_PLACEHOLDER = "creator_contact";
-    private final List<InvocableCommandHandler> allHandlers;
+
     private final String cachedTemplate;
+
+    private final List<InvocableCommandHandler> allHandlers;
     private final BotProperties botProperties;
 
-    public HelpCommandHandler(@Lazy List<InvocableCommandHandler> allHandlers,
-                              @Value("classpath:templates/help_message.md") Resource helpTemplate,
-                              BotProperties botProperties) {
-        super(List.of());
+    public BotInstructionsCommandHandler(@Lazy List<InvocableCommandHandler> allHandlers,
+                                         @Value("classpath:templates/help_message.md") Resource helpTemplate,
+                                         BotProperties botProperties) {
         this.allHandlers = allHandlers;
         this.botProperties = botProperties;
         this.cachedTemplate = readTemplate(helpTemplate);
-
-
     }
 
     private String readTemplate(Resource resource) {
         byte[] bdata;
-        try {
-            bdata = FileCopyUtils.copyToByteArray(resource.getInputStream());
+        try (InputStream is = resource.getInputStream()){
+            bdata = FileCopyUtils.copyToByteArray(is);
         } catch (IOException e) {
             throw new UserFriendlyException("Ошибка при формировании описания команд");
         }
@@ -55,7 +55,7 @@ public class HelpCommandHandler extends GroupingCommandHandler {
 
     @Override
     public String getCommand() {
-        return "Помощь";
+        return "Инструкция по работе с ботом";
     }
 
     @Override
@@ -75,21 +75,31 @@ public class HelpCommandHandler extends GroupingCommandHandler {
         return List.of(message);
     }
 
+
+    /**
+     * hash = длина слова
+     * при каких одинаковых словах будет разныей хэш?
+     *
+     * @return
+     */
     private String getCommandsDescription() {
+        InvocableCommandHandler cancelCommandHandler = allHandlers.stream()
+                .filter(h -> h instanceof CancelCommandHandler)
+                .findFirst()
+                .orElseThrow();
+
         String commandsInfo = allHandlers.stream()
                 .filter(h ->  !h.getDescription().isBlank())
-                .filter(h -> !(h instanceof CancelCommandHandler))
+                .filter(h -> h != cancelCommandHandler)
                 .map(h -> "- *%s* - %s".formatted (h.getCommand(), h.getDescription()))
                 .collect(Collectors.joining("\n"));
-        String cancelCommand = allHandlers.stream()
-                .filter(h -> h instanceof CancelCommandHandler)
-                .map(InvocableCommandHandler::getCommand)
-                .findFirst()
-                .orElse("/cancel");
+
         Map<String, String> values = Map.of(
                 COMMANDS_PLACEHOLDER, commandsInfo,
-                CANCEL_COMMAND_PLACEHOLDER, cancelCommand,
-                CREATOR_CONTACT_PLACEHOLDER, botProperties.getCreatorContact());
+                CANCEL_COMMAND_PLACEHOLDER, cancelCommandHandler.getCommand(),
+                CREATOR_CONTACT_PLACEHOLDER, botProperties.getCreatorContact()
+        );
+
         StringSubstitutor sub = new StringSubstitutor(values);
         return sub.replace(cachedTemplate);
     }

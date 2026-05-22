@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import ru.nesterov.bot.handlers.abstractions.GroupingCommandHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.AiAnalyzerHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.GetActiveClientsHandler;
-import ru.nesterov.bot.handlers.implementation.invocable.HelpCommandHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.getClientStatisticHandler.GetClientStatisticHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.getSchedule.GetClientScheduleCommandHandler;
 
