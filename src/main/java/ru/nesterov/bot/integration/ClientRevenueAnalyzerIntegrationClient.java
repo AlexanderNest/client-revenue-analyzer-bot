@@ -64,21 +64,21 @@ public class ClientRevenueAnalyzerIntegrationClient {
         GetForMonthRequest getForMonthRequest = new GetForMonthRequest();
         getForMonthRequest.setMonthName(monthName);
 
-        return post(String.valueOf(userId), getForMonthRequest, "/revenue-analyzer/events/analyzer/getIncomeAnalysisForMonth", GetIncomeAnalysisForMonthResponse.class).getBody();
+        return post(String.valueOf(userId), getForMonthRequest, revenueAnalyzerProperties.getGetIncomeAnalysisForMonthUrl(), GetIncomeAnalysisForMonthResponse.class).getBody();
     }
 
-    public GetClientStatisticResponse getClientStatistic(long userId, String clientName){
+    public GetClientStatisticResponse getClientStatistic(long userId, String clientName) {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("clientName", clientName);
 
-        return get(String.valueOf(userId), requestParams, "/revenue-analyzer/events/analyzer/getClientStatistic", GetClientStatisticResponse.class).getBody();
+        return get(String.valueOf(userId), requestParams, revenueAnalyzerProperties.getGetClientStatisticUrl(), GetClientStatisticResponse.class).getBody();
     }
 
     public GetYearBusynessStatisticsResponse getYearBusynessStatistics(long userId, int year) {
         GetForYearRequest getForYearRequest = new GetForYearRequest();
         getForYearRequest.setYear(year);
 
-        return post(String.valueOf(userId), getForYearRequest, "/revenue-analyzer/user/analyzer/getYearBusynessStatistics", GetYearBusynessStatisticsResponse.class).getBody();
+        return post(String.valueOf(userId), getForYearRequest, revenueAnalyzerProperties.getGetYearBusynessStatisticsUrl(), GetYearBusynessStatisticsResponse.class).getBody();
     }
 
     public AiAnalyzerResponse getAiStatistics(long userId) {
@@ -86,12 +86,12 @@ public class ClientRevenueAnalyzerIntegrationClient {
         GetForMonthRequest request = new GetForMonthRequest();
         request.setMonthName(currentMonth);
 
-        return post(String.valueOf(userId), request, "/revenue-analyzer/ai/generateRecommendation", AiAnalyzerResponse.class).getBody();
+        return post(String.valueOf(userId), request, revenueAnalyzerProperties.getGenerateRecommendationUrl(), AiAnalyzerResponse.class).getBody();
     }
 
     @Cacheable(value = "getUserByUsername", key = "#request.username", unless = "#result == null")
     public GetUserResponse getUserByUsername(GetUserRequest request) {
-        ResponseEntity<GetUserResponse> responseEntity = post(request.getUsername(), request, "/revenue-analyzer/user/getUserByUsername", GetUserResponse.class);
+        ResponseEntity<GetUserResponse> responseEntity = post(request.getUsername(), request, revenueAnalyzerProperties.getGetUserByUsernameUrl(), GetUserResponse.class);
         if (responseEntity.getStatusCode().isSameCodeAs(HttpStatus.NOT_FOUND)) {
             return null;
         }
@@ -101,7 +101,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
     public CreateClientResponse createClient(String userId, CreateClientRequest createClientRequest) {
         try {
             ResponseEntity<String> response = restTemplate.exchange(
-                    revenueAnalyzerProperties.getUrl() + "/revenue-analyzer/client/create",
+                    revenueAnalyzerProperties.getUrl() + revenueAnalyzerProperties.getClientCreateUrl(),
                     HttpMethod.POST,
                     new HttpEntity<>(createClientRequest, createHeaders(userId)),
                     String.class
@@ -136,7 +136,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
     }
 
     public CreateUserResponse createUser(CreateUserRequest createUserRequest) {
-        ResponseEntity<CreateUserResponse> responseEntity = post(createUserRequest.getUserIdentifier(), createUserRequest, "/revenue-analyzer/user/createUser", CreateUserResponse.class);
+        ResponseEntity<CreateUserResponse> responseEntity = post(createUserRequest.getUserIdentifier(), createUserRequest, revenueAnalyzerProperties.getCreateUserUrl(), CreateUserResponse.class);
         return responseEntity.getBody();
     }
 
@@ -149,7 +149,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
         ResponseEntity<ClientAllScheduleResponse> response = post(
                 String.valueOf(userId),
                 request,
-                "/revenue-analyzer/client/getSchedule",
+                revenueAnalyzerProperties.getGetScheduleUrl(),
                 ClientAllScheduleResponse.class
         );
 
@@ -160,8 +160,9 @@ public class ClientRevenueAnalyzerIntegrationClient {
     public List<GetActiveClientResponse> getActiveClients(long userId) {
         return postForList(String.valueOf(userId),
                 null,
-                "/revenue-analyzer/client/getActiveClients",
-                new ParameterizedTypeReference<>() {}
+                revenueAnalyzerProperties.getGetActiveClientsUrl(),
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -169,7 +170,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
         ResponseEntity<MakeEventsBackupResponse> response = get(
                 String.valueOf(userId),
                 null,
-                "/revenue-analyzer/events/backup",
+                revenueAnalyzerProperties.getEventsBackupUrl(),
                 MakeEventsBackupResponse.class
         );
 
@@ -178,8 +179,9 @@ public class ClientRevenueAnalyzerIntegrationClient {
 
     public List<GetUnpaidEventsResponse> getUnpaidEvents(long userId) {
         return getForList(String.valueOf(userId),
-                "/revenue-analyzer/events/analyzer/getUnpaidEvents",
-                new ParameterizedTypeReference<>() {}
+                revenueAnalyzerProperties.getGetUnpaidEventsUrl(),
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
@@ -189,7 +191,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
 
         return delete(String.valueOf(userId),
                 params,
-                "/revenue-analyzer/client"
+                revenueAnalyzerProperties.getClientUrl()
         );
     }
 
@@ -197,16 +199,16 @@ public class ClientRevenueAnalyzerIntegrationClient {
 
         return post(String.valueOf(userId),
                 updateClientRequest,
-                "/revenue-analyzer/client/update",
+                revenueAnalyzerProperties.getClientUpdateUrl(),
                 UpdateClientResponse.class
         ).getBody();
     }
 
-    private <T> ResponseEntity<T> get(String username, MultiValueMap<String, String> requestParams , String endpoint, Class<T> responseType) {
+    private <T> ResponseEntity<T> get(String username, MultiValueMap<String, String> requestParams, String endpoint, Class<T> responseType) {
         return exchange(username, requestParams, null, endpoint, responseType, HttpMethod.GET);
     }
 
-    private ResponseEntity<Void> delete(String username, MultiValueMap<String, String> requestParams , String endpoint) {
+    private ResponseEntity<Void> delete(String username, MultiValueMap<String, String> requestParams, String endpoint) {
         return exchange(username, requestParams, null, endpoint, Void.class, HttpMethod.DELETE);
     }
 
@@ -214,7 +216,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
         GetAllUsersByRoleAndSourceRequest request = new GetAllUsersByRoleAndSourceRequest();
         request.setRole(role);
         request.setSource(source);
-        ResponseEntity<GetAllUsersByRoleAndSourceResponse> responseEntity = post(String.valueOf(chatId), request, "/revenue-analyzer/user/getUsersIdByRoleAndSource",
+        ResponseEntity<GetAllUsersByRoleAndSourceResponse> responseEntity = post(String.valueOf(chatId), request, revenueAnalyzerProperties.getGetUsersIdByRoleAndSourceUrl(),
                 GetAllUsersByRoleAndSourceResponse.class
         );
         return responseEntity.getBody();
