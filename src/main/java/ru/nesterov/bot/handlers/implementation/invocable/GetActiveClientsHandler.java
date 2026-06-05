@@ -49,4 +49,9 @@ public class GetActiveClientsHandler extends InvocableCommandHandler {
 
         return activeClientsResponse.toString();
     }
+
+    @Override
+    public String getDescription() {
+        return "Просмотр актуального списка клиентов с их тарифами и описанием.";
+    }
 }

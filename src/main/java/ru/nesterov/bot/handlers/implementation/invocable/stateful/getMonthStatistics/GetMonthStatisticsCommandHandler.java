@@ -131,6 +131,6 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
 
     @Override
     public String getDescription() {
-        return "Анализ доходов за выбранный месяц";
+        return "Финансовый отчет за месяц: фактический доход, потенциальная прибыль, потери.";
     }
 }

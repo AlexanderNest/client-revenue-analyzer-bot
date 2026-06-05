@@ -106,7 +106,7 @@ public class CreateClientHandler extends StatefulCommandHandler<State, CreateCli
 
     @Override
     public String getDescription() {
-        return "Создание нового пользователя";
+        return "Регистрация нового клиента: установка имени, тарифа, контактных данных.";
     }
 }
 

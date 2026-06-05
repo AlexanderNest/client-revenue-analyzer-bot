@@ -26,7 +26,7 @@ public class ClientInfoOperationGroupHandler extends GroupingCommandHandler {
 
     @Override
     public String getCommand() {
-        return "Информация о клиентах";
+        return "Статистика и информация о текущих клиентах";
     }
 
     @Override

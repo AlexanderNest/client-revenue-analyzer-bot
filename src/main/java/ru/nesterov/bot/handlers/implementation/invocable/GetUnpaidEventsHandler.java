@@ -33,7 +33,7 @@ public class GetUnpaidEventsHandler extends InvocableCommandHandler {
 
     @Override
     public String getDescription() {
-        return "Вывести список неоплаченных встреч";
+        return "Поиск встреч, по которым еще не была зафиксированна оплата.";
     }
 
     private String formatMessage(List<GetUnpaidEventsResponse> events) {

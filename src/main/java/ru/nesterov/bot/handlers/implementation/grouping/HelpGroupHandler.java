@@ -16,4 +16,9 @@ public class HelpGroupHandler extends GroupingCommandHandler {
     public String getCommand() {
         return "Помощь";
     }
+
+    @Override
+    public String getDescription() {
+        return "Справочник по всем функциям и возможностям бота";
+    }
 }

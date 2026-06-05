@@ -92,7 +92,7 @@ public class MakeEventsBackupHandler extends StatefulCommandHandler<State, MakeE
 
     @Override
     public String getDescription() {
-        return "Создать резервную копию событий из Вашего календаря";
+        return "Создание резервной копии событий из Вашего календаря";
     }
 }
 

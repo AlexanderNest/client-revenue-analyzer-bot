@@ -62,6 +62,6 @@ public class DeleteClientHandler extends StatefulCommandHandler<State, DeleteCli
 
     @Override
     public String getDescription() {
-        return "Удалить выбранного клиента из Вашей базы";
+        return "Удаление выбранного клиента из Вашей базы";
     }
 }

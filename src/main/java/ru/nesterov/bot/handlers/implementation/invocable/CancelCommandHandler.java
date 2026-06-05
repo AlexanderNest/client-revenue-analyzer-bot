@@ -38,6 +38,6 @@ public class CancelCommandHandler extends InvocableCommandHandler {
 
     @Override
     public String getDescription() {
-        return "Сбрасывает текущее состояние бота";
+        return "Сброс текущего действия и возврат в главное меню.";
     }
 }

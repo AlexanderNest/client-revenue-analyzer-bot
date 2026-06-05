@@ -123,6 +123,6 @@ public class UpdateClientHandler extends StatefulCommandHandler<State, UpdateCli
 
     @Override
     public String getDescription() {
-        return "Изменить данные существующего клиента";
+        return "Изменение данных существующего клиента: актуализация тарифа, телефона или описания";
     }
 }

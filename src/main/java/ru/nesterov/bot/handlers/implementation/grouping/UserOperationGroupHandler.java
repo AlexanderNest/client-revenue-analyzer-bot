@@ -22,7 +22,7 @@ public class UserOperationGroupHandler extends GroupingCommandHandler {
 
     @Override
     public String getDescription() {
-        return "Сервисные действия пользователя и бизнес статистика за год";
+        return "Анализ продуктивности и сервисные функции";
     }
 
     @Override

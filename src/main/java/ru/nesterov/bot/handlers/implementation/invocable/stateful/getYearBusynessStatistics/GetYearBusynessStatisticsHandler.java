@@ -89,7 +89,7 @@ public class GetYearBusynessStatisticsHandler extends StatefulCommandHandler<Sta
 
     @Override
     public String getDescription() {
-        return "Получение годового отчета за указанный год";
+        return "Анализ загруженности за год: распределение рабочего времени по месяцам и дням недели.";
     }
 }
 

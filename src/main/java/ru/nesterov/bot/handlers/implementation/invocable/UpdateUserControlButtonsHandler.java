@@ -47,7 +47,7 @@ public class UpdateUserControlButtonsHandler extends InvocableCommandHandler {
 
     @Override
     public String getDescription() {
-        return "Обновление кнопок управления";
+        return "Обновление кнопок управления и возврат в главное меню";
     }
 
     @Override

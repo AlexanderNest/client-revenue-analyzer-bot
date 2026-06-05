@@ -25,7 +25,7 @@ public class ClientOperationGroupHandler extends GroupingCommandHandler {
 
     @Override
     public String getDescription() {
-        return "Меню управления списком клиентов";
+        return "Инструменты для редактирования списка клиентов";
     }
 
     @Override

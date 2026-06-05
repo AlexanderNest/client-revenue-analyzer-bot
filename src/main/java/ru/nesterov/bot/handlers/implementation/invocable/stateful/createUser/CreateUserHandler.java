@@ -123,6 +123,6 @@ public class CreateUserHandler extends StatefulCommandHandler<State, CreateUserR
 
     @Override
     public String getDescription() {
-        return "Создание нового клиента для зарегистрированного пользователя";
+        return "Начальная настройка: привязка Google календарей для сбора статистики.";
     }
 }
