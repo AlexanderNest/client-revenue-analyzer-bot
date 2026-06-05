@@ -22,4 +22,9 @@ public class ClientOperationGroupHandler extends GroupingCommandHandler {
     public String getCommand() {
         return "Изменение списка клиентов";
     }
+
+    @Override
+    public int getOrder() {
+        return 4;
+    }
 }
