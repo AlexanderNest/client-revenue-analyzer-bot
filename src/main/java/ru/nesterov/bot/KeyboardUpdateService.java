@@ -29,6 +29,7 @@ public class KeyboardUpdateService {
         if (!shouldUpdateKeyboard(TelegramUpdateUtils.getChatId(update))) {
             return List.of();
         }
+
         return updateUserControlButtonsHandler.handle(update);
     }
 
