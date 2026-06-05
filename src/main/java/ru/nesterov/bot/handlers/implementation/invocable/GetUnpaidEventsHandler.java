@@ -43,4 +43,8 @@ public class GetUnpaidEventsHandler extends InvocableCommandHandler {
         }
         return message.toString();
     }
+    @Override
+    public int getOrder() {
+        return 2;
+    }
 }

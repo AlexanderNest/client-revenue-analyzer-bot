@@ -18,4 +18,9 @@ public class MoneyOperationGroupHandler extends GroupingCommandHandler {
     public String getCommand() {
         return "Денежные операции";
     }
+
+    @Override
+    public int getOrder() {
+        return 1;
+    }
 }

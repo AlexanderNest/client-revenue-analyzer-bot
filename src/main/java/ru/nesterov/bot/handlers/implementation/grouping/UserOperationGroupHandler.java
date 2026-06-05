@@ -18,4 +18,9 @@ public class UserOperationGroupHandler extends GroupingCommandHandler {
     public String getCommand() {
         return "Действия пользователя";
     }
+
+    @Override
+    public int getOrder() {
+        return 3;
+    }
 }

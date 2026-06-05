@@ -7,6 +7,7 @@ import ru.nesterov.bot.dto.GetUserRequest;
 import ru.nesterov.bot.dto.GetUserResponse;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,6 +19,7 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
 
     protected GroupingCommandHandler(List<InvocableCommandHandler> groupedCommandHandler) {
         this.groupedCommandHandlersNames = groupedCommandHandler.stream()
+                .sorted((Comparator.comparingInt(InvocableCommandHandler::getOrder)))
                 .map(InvocableCommandHandler::getCommand)
                 .toList();
     }
