@@ -1,6 +1,5 @@
 package ru.nesterov.bot.handlers.abstractions;
 
-import org.springframework.core.Ordered;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.GetUserRequest;
@@ -19,7 +18,10 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
 
     protected GroupingCommandHandler(List<InvocableCommandHandler> groupedCommandHandler) {
         this.groupedCommandHandlersNames = groupedCommandHandler.stream()
-                .sorted((Comparator.comparingInt(InvocableCommandHandler::getOrder)))
+                .sorted(
+                        Comparator.comparingInt(InvocableCommandHandler::getOrder)
+                                .thenComparing(InvocableCommandHandler::getCommand)
+                )
                 .map(InvocableCommandHandler::getCommand)
                 .toList();
     }
