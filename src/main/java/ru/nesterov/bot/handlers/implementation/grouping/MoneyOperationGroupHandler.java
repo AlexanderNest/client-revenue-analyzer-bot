@@ -16,6 +16,11 @@ public class MoneyOperationGroupHandler extends GroupingCommandHandler {
 
     @Override
     public String getCommand() {
+        return "Денежные операции";
+    }
+
+    @Override
+    public String getDescription() {
         return "Финансовые отчеты и работа с оплатами";
     }
 

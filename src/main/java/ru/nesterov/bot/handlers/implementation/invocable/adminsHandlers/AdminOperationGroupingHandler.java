@@ -20,6 +20,11 @@ public class AdminOperationGroupingHandler extends GroupingCommandHandler {
 
     @Override
     public String getCommand() {
-        return "Панель администратора: управление рассылками и пользователями.";
+        return "Администрирование";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Панель администратора: управление рассылками и пользователями";
     }
 }

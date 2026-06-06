@@ -63,6 +63,7 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
         editMessageText.setMessageId(messageId);
         editMessageText.setText(text);
         editMessageText.setReplyMarkup(keyboardMarkup);
+        editMessageText.setParseMode("Markdown");
 
         return List.of(editMessageText);
     }

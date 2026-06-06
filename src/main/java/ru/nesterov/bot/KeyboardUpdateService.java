@@ -26,6 +26,14 @@ public class KeyboardUpdateService {
 
     @NotNull
     public List<BotApiMethod<?>> getUpdateKeyboard(Update update) {
+        if (update.hasCallbackQuery()) {
+            return List.of();
+        }
+        String messageText = update.hasMessage() ? update.getMessage().getText() : null;
+        if ("/start".equals(messageText)) {
+            shouldUpdateKeyboard(TelegramUpdateUtils.getChatId(update));
+            return List.of();
+        }
         if (!shouldUpdateKeyboard(TelegramUpdateUtils.getChatId(update))) {
             return List.of();
         }

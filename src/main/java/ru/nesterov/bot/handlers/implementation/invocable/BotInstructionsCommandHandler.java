@@ -1,56 +1,40 @@
 package ru.nesterov.bot.handlers.implementation.invocable;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringSubstitutor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import ru.nesterov.bot.config.BotProperties;
-import ru.nesterov.bot.exception.UserFriendlyException;
-import ru.nesterov.bot.handlers.abstractions.CommandHandler;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import ru.nesterov.bot.config.BotInfoProperties;
+import ru.nesterov.bot.handlers.abstractions.GroupingCommandHandler;
 import ru.nesterov.bot.handlers.abstractions.InvocableCommandHandler;
+import ru.nesterov.bot.handlers.callback.ButtonCallback;
+import ru.nesterov.bot.handlers.implementation.grouping.HelpGroupHandler;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class BotInstructionsCommandHandler extends InvocableCommandHandler {
-    private static final String COMMANDS_PLACEHOLDER = "commands";
-    private static final String CANCEL_COMMAND_PLACEHOLDER = "cancel_command";
-    private static final String CREATOR_CONTACT_PLACEHOLDER = "creator_contact";
-
-    private final String cachedTemplate;
+    private static final String CATEGORY_PREFIX = "category_";
 
     private final List<InvocableCommandHandler> allHandlers;
-    private final BotProperties botProperties;
+    private final List<GroupingCommandHandler> allGroups;
+    private final BotInfoProperties botInfoProperties;
 
     public BotInstructionsCommandHandler(@Lazy List<InvocableCommandHandler> allHandlers,
-                                         @Value("classpath:templates/help_message.md") Resource helpTemplate,
-                                         BotProperties botProperties) {
+                                         @Lazy List<GroupingCommandHandler> allGroups,
+                                         BotInfoProperties botInfoProperties) {
         this.allHandlers = allHandlers;
-        this.botProperties = botProperties;
-        this.cachedTemplate = readTemplate(helpTemplate);
-    }
-
-    private String readTemplate(Resource resource) {
-        byte[] bdata;
-        try (InputStream is = resource.getInputStream()){
-            bdata = FileCopyUtils.copyToByteArray(is);
-        } catch (IOException e) {
-            throw new UserFriendlyException("Ошибка при формировании описания команд");
-        }
-        return new String(bdata, StandardCharsets.UTF_8);
+        this.allGroups = allGroups;
+        this.botInfoProperties = botInfoProperties;
     }
 
     @Override
@@ -65,44 +49,86 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
 
     @Override
     public List<BotApiMethod<?>> handle(Update update){
-        String finalMessage = getCommandsDescription();
+        long chatId = TelegramUpdateUtils.getChatId(update);
+        if (update.hasCallbackQuery()) {
+            String callbackValue = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData()).getValue();
 
-        SendMessage message = new SendMessage();
-        message.setChatId(String.valueOf(TelegramUpdateUtils.getChatId(update)));
-        message.setText(finalMessage);
-        message.setParseMode("Markdown");
-
-        return List.of(message);
+            if ("back".equals(callbackValue)) {
+                return editMessage(chatId,
+                        TelegramUpdateUtils.getMessageId(update),
+                        "Выберите интересующий Вас раздел:",
+                        getGroupsKeyboard(update));
+            }
+            if (callbackValue.startsWith(CATEGORY_PREFIX)) {
+                String groupName = callbackValue.substring(CATEGORY_PREFIX.length());
+                return editMessage(chatId,
+                        TelegramUpdateUtils.getMessageId(update),
+                        getCategoryDescription(groupName),
+                        getBackKeyboard());
+            }
+        }
+        return getReplyKeyboard(chatId, "Привет! Я помогу тебе освоиться! Выбери интересующий раздел:", getGroupsKeyboard(update));
     }
 
+    private InlineKeyboardMarkup getGroupsKeyboard(Update update) {
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
 
-    /**
-     * hash = длина слова
-     * при каких одинаковых словах будет разныей хэш?
-     *
-     * @return
-     */
-    private String getCommandsDescription() {
-        InvocableCommandHandler cancelCommandHandler = allHandlers.stream()
-                .filter(h -> h instanceof CancelCommandHandler)
-                .findFirst()
-                .orElseThrow();
+        allGroups.stream()
+                .filter(group -> group.isDisplayed(update))
+                .filter(group -> !(group instanceof HelpGroupHandler))
+                .filter(group -> !group.getCommand().startsWith("/"))
+                .sorted(InvocableCommandHandler.DEFAULT_COMPARATOR)
+                .forEach(group -> {
+                    InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
+                    inlineKeyboardButton.setText(group.getCommand());
+                    ButtonCallback callback = new ButtonCallback();
+                    callback.setCommand(getCommand());
+                    callback.setValue(CATEGORY_PREFIX + group.getCommand());
+                    inlineKeyboardButton.setCallbackData(buttonCallbackService.getTelegramButtonCallbackString(callback));
 
-        String commandsInfo = allHandlers.stream()
-                .filter(h ->  !h.getDescription().isBlank())
-                .filter(h -> h != cancelCommandHandler)
-                .map(h -> "- *%s* - %s".formatted (h.getCommand(), h.getDescription()))
-                .collect(Collectors.joining("\n"));
-
-        Map<String, String> values = Map.of(
-                COMMANDS_PLACEHOLDER, commandsInfo,
-                CANCEL_COMMAND_PLACEHOLDER, cancelCommandHandler.getCommand(),
-                CREATOR_CONTACT_PLACEHOLDER, botProperties.getCreatorContact()
-        );
-
-        StringSubstitutor sub = new StringSubstitutor(values);
-        return sub.replace(cachedTemplate);
+                    rows.add(List.of(inlineKeyboardButton));
+                });
+        inlineKeyboardMarkup.setKeyboard(rows);
+        return inlineKeyboardMarkup;
     }
 
+    private String getCategoryDescription(String groupName) {
+        Map<String, InvocableCommandHandler> handlerMap = allHandlers.stream()
+                .collect(Collectors.toMap(InvocableCommandHandler::getCommand, h -> h, (a, b) -> b));
+        Optional<GroupingCommandHandler> groupOpt = allGroups.stream()
+                .filter(g -> g.getCommand().equals(groupName))
+                .findFirst();
 
+        if (groupOpt.isEmpty()) {
+            return "Раздел не найден";
+        }
+
+        GroupingCommandHandler group = groupOpt.get();
+        StringBuilder sb = new StringBuilder();
+        sb.append("*").append(group.getCommand().toUpperCase()).append("*\n\n");
+
+        group.getGroupedCommandHandlersNames().forEach(cmdName -> {
+            InvocableCommandHandler h = handlerMap.get(cmdName);
+            if (h != null && !h.getDescription().isBlank()) {
+                sb.append("• `").append(h.getCommand()).append("` - ").append(h.getDescription()).append("\n\n");
+            }
+        });
+        sb.append("\nЕсли возникнут вопросы, обращайтесь к ").append(botInfoProperties.getCreatorContact());
+        return sb.toString();
+    }
+
+    private InlineKeyboardMarkup getBackKeyboard() {
+        InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+        InlineKeyboardButton backButton = new InlineKeyboardButton();
+        backButton.setText("⬅️ Назад к разделам");
+
+        ButtonCallback callback = new ButtonCallback();
+        callback.setCommand(getCommand());
+        callback.setValue("back");
+        backButton.setCallbackData(buttonCallbackService.getTelegramButtonCallbackString(callback));
+
+        markup.setKeyboard(List.of(List.of(backButton)));
+        return markup;
+    }
 }

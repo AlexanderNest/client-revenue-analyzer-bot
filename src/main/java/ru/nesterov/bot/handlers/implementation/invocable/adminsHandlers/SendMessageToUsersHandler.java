@@ -31,6 +31,11 @@ public class SendMessageToUsersHandler extends StatefulCommandHandler<State, Sen
     }
 
     @Override
+    public String getDescription() {
+        return "Отправка сообщения всем зарегистрированным пользователям бота";
+    }
+
+    @Override
     protected List<Role> getApplicableRoles() {
         return List.of(Role.ADMIN);
     }

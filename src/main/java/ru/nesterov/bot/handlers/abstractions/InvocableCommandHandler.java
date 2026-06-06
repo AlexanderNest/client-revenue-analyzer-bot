@@ -8,12 +8,9 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.nesterov.bot.dto.GetActiveClientResponse;
-import ru.nesterov.bot.dto.GetUserRequest;
-import ru.nesterov.bot.dto.GetUserResponse;
 import ru.nesterov.bot.dto.Role;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
-
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +20,9 @@ import java.util.List;
  * Обработчик, который вызывается по отправленной команде
  */
 public abstract class InvocableCommandHandler extends SendingMessageCommandHandler implements Ordered {
+    public static final Comparator<InvocableCommandHandler> DEFAULT_COMPARATOR =
+            Comparator.comparingInt(InvocableCommandHandler::getOrder)
+                    .thenComparing(InvocableCommandHandler::getCommand);
     /**
      * Команда, которая вызовет обработчик
      */
