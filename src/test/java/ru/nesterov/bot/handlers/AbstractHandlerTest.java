@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import ru.nesterov.bot.config.BotInfoProperties;
 import ru.nesterov.bot.config.BotProperties;
 import ru.nesterov.bot.handlers.implementation.UndefinedHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.CancelCommandHandler;
@@ -29,7 +30,8 @@ import ru.nesterov.bot.statemachine.ActionService;
         BotProperties.class,
         CancelCommandHandler.class,
         ActionService.class,
-        UndefinedHandler.class
+        UndefinedHandler.class,
+        BotInfoProperties.class
 })
 @SpringBootTest
 public abstract class AbstractHandlerTest {
