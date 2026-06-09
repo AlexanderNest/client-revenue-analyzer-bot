@@ -12,6 +12,7 @@ public class HelpGroupHandler extends GroupingCommandHandler {
     protected HelpGroupHandler(BotInstructionsCommandHandler botInstructionsCommandHandler) {
         super(List.of(botInstructionsCommandHandler));
     }
+
     @Override
     protected List<Role> getApplicableRoles() {
         return List.of(Role.ADMIN, Role.USER);

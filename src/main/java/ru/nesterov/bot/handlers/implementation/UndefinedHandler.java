@@ -19,5 +19,4 @@ public class UndefinedHandler extends SendingMessageCommandHandler {
     public boolean isApplicable(Update update) {
         return false; // не должен подбираться, вызывается только вручную сервисом
     }
-
 }
