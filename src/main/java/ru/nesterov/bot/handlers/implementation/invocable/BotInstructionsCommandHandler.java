@@ -57,17 +57,27 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
                 return editMessage(chatId,
                         TelegramUpdateUtils.getMessageId(update),
                         "Выберите интересующий Вас раздел:",
-                        getGroupsKeyboard(update));
+                        getGroupsKeyboard(update),
+                        "Markdown");
             }
             if (callbackValue.startsWith(CATEGORY_PREFIX)) {
                 String groupName = callbackValue.substring(CATEGORY_PREFIX.length());
                 return editMessage(chatId,
                         TelegramUpdateUtils.getMessageId(update),
                         getCategoryDescription(groupName),
-                        getBackKeyboard());
+                        getBackKeyboard(),
+                        "Markdown");
             }
         }
         return getReplyKeyboard(chatId, "Привет! Я помогу тебе освоиться! Выбери интересующий раздел:", getGroupsKeyboard(update));
+    }
+
+    private Map<String, InvocableCommandHandler> getHandlerMap() {
+        return allHandlers.stream()
+                .collect(Collectors.toMap(
+                        InvocableCommandHandler::getCommand,
+                        h -> h, (a, b) -> a)
+                );
     }
 
     private InlineKeyboardMarkup getGroupsKeyboard(Update update) {
@@ -77,7 +87,6 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
         allGroups.stream()
                 .filter(group -> group.isDisplayed(update))
                 .filter(group -> !(group instanceof HelpGroupHandler))
-                .filter(group -> !group.getCommand().startsWith("/"))
                 .sorted(InvocableCommandHandler.DEFAULT_COMPARATOR)
                 .forEach(group -> {
                     InlineKeyboardButton inlineKeyboardButton = new InlineKeyboardButton();
@@ -94,8 +103,7 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
     }
 
     private String getCategoryDescription(String groupName) {
-        Map<String, InvocableCommandHandler> handlerMap = allHandlers.stream()
-                .collect(Collectors.toMap(InvocableCommandHandler::getCommand, h -> h, (a, b) -> b));
+        Map<String, InvocableCommandHandler> handlerMap = getHandlerMap();
         Optional<GroupingCommandHandler> groupOpt = allGroups.stream()
                 .filter(g -> g.getCommand().equals(groupName))
                 .findFirst();
@@ -106,12 +114,12 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
 
         GroupingCommandHandler group = groupOpt.get();
         StringBuilder sb = new StringBuilder();
-        sb.append("*").append(group.getCommand().toUpperCase()).append("*\n\n");
+        sb.append("*%s*\n\n".formatted(group.getCommand().toUpperCase()));
 
         group.getGroupedCommandHandlersNames().forEach(cmdName -> {
             InvocableCommandHandler h = handlerMap.get(cmdName);
             if (h != null && !h.getDescription().isBlank()) {
-                sb.append("• `").append(h.getCommand()).append("` - ").append(h.getDescription()).append("\n\n");
+                sb.append("• `%s` - %s\n\n".formatted(h.getCommand(), h.getDescription()));
             }
         });
         sb.append("\nЕсли возникнут вопросы, обращайтесь к ").append(botInfoProperties.getCreatorContact());

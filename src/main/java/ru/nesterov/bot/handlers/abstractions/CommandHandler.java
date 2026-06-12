@@ -26,11 +26,4 @@ public interface CommandHandler {
         return Priority.NORMAL;
     }
 
-    /**
-     * краткое описание функционала обработчика для формирования справки пользователю
-     */
-    default String getDescription() {
-        return "";
-    }
-
 }

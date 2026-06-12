@@ -1,29 +1,23 @@
 package ru.nesterov.bot.handlers.abstractions;
 
-import lombok.Getter;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.GetUserRequest;
 import ru.nesterov.bot.dto.GetUserResponse;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * Обработчик, который будет отображаться в списке команд для отправки на стороне пользователя. Он же отвечает за группу команд
  */
-@Getter
 public abstract class GroupingCommandHandler extends InvocableCommandHandler {
 
     private final List<String> groupedCommandHandlersNames;
 
     protected GroupingCommandHandler(List<InvocableCommandHandler> groupedCommandHandler) {
         this.groupedCommandHandlersNames = groupedCommandHandler.stream()
-                .sorted(
-                        Comparator.comparingInt(InvocableCommandHandler::getOrder)
-                                .thenComparing(InvocableCommandHandler::getCommand)
-                )
+                .sorted(InvocableCommandHandler.DEFAULT_COMPARATOR)
                 .map(InvocableCommandHandler::getCommand)
                 .toList();
     }
@@ -55,5 +49,9 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
     public boolean isApplicable(Update update) {
         return update.hasMessage()
                 && getCommand().equals(update.getMessage().getText());
+    }
+
+    public List<String> getGroupedCommandHandlersNames() {
+        return List.copyOf(groupedCommandHandlersNames);
     }
 }
