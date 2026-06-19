@@ -35,12 +35,10 @@ public class GetUserInfoHandler extends InvocableCommandHandler {
                 "Информация о пользователе:%n" +
                 "Telegram ID: %d%n" +
                 "ID в системе: %d%n" +
-                "Username: %s%n" +
-                "Роль: %s",
+                "Username: %s%n",
                 telegramUserId,
                 user.getUserId(),
-                user.getUsername(),
-                user.getRole()
+                user.getUsername()
         );
 
         return getPlainSendMessage(chatId, message);
