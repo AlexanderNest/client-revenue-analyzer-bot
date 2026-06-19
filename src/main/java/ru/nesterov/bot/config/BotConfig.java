@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -12,6 +13,7 @@ import ru.nesterov.bot.RevenueAnalyzerBot;
 
 @Configuration
 @Slf4j
+@EnableRetry
 public class BotConfig {
     @Bean
     public TelegramBotsApi telegramBotsApi(RevenueAnalyzerBot revenueAnalyzerBot) throws TelegramApiException {
