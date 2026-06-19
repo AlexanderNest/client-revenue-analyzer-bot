@@ -20,13 +20,13 @@ public class GetUserInfoHandler extends InvocableCommandHandler {
 
     @Override
     public List<BotApiMethod<?>> handle(Update update) {
-        long chatId = TelegramUpdateUtils.getChatId(update);
         long telegramUserId = TelegramUpdateUtils.getUserId(update);
 
         GetUserRequest request = new GetUserRequest();
         request.setUsername(String.valueOf(telegramUserId));
         GetUserResponse user = client.getUserByUsername(request);
 
+        long chatId = TelegramUpdateUtils.getChatId(update);
         if (user == null) {
             return getPlainSendMessage(chatId, "Пользователь не найден в системе.");
         }
@@ -38,7 +38,7 @@ public class GetUserInfoHandler extends InvocableCommandHandler {
                 "Username: %s%n",
                 telegramUserId,
                 user.getUserId(),
-                user.getUsername()
+                update.getCallbackQuery().getFrom().getUserName()
         );
 
         return getPlainSendMessage(chatId, message);
