@@ -11,17 +11,20 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.nesterov.bot.config.BotProperties;
 import ru.nesterov.bot.config.RevenueAnalyzerProperties;
 import ru.nesterov.bot.dto.AiAnalyzerResponse;
+import ru.nesterov.bot.dto.AveragePriceResponse;
 import ru.nesterov.bot.dto.ClientAllScheduleResponse;
 import ru.nesterov.bot.dto.CreateClientRequest;
 import ru.nesterov.bot.dto.CreateClientResponse;
@@ -30,6 +33,7 @@ import ru.nesterov.bot.dto.CreateUserResponse;
 import ru.nesterov.bot.dto.GetActiveClientResponse;
 import ru.nesterov.bot.dto.GetAllUsersByRoleAndSourceRequest;
 import ru.nesterov.bot.dto.GetAllUsersByRoleAndSourceResponse;
+import ru.nesterov.bot.dto.GetBetweenDatesRequest;
 import ru.nesterov.bot.dto.GetClientStatisticResponse;
 import ru.nesterov.bot.dto.GetForClientScheduleRequest;
 import ru.nesterov.bot.dto.GetForMonthRequest;
@@ -50,12 +54,14 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class ClientRevenueAnalyzerIntegrationClient {
     private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final RevenueAnalyzerProperties revenueAnalyzerProperties;
     private final BotProperties botProperties;
     private final ObjectMapper objectMapper;
@@ -202,6 +208,29 @@ public class ClientRevenueAnalyzerIntegrationClient {
                 revenueAnalyzerProperties.getClientUpdateUrl(),
                 UpdateClientResponse.class
         ).getBody();
+    }
+
+    public Double getAverageMeetingPrice(long userId, LocalDateTime start, LocalDateTime end) {
+        GetBetweenDatesRequest request = new GetBetweenDatesRequest();
+        request.setStartDate(start);
+        request.setEndDate(end);
+
+        AveragePriceResponse response = restClient.post()
+                .uri(revenueAnalyzerProperties.getGetAverageMeetingPriceBetweenDatesUrl())
+                .headers(h -> {
+                    h.set("X-secret-token", botProperties.getSecretToken());
+                    h.set("X-username", String.valueOf(userId));
+                })
+                .body(request)
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, resp) -> {
+                    throw new UserFriendlyException("Ошибка сервера при расчете среднего чека");
+                })
+                .body(AveragePriceResponse.class);
+
+        return Optional.ofNullable(response)
+                .map(AveragePriceResponse::getAveragePrice)
+                .orElse(0.0);
     }
 
     private <T> ResponseEntity<T> get(String username, MultiValueMap<String, String> requestParams, String endpoint, Class<T> responseType) {
