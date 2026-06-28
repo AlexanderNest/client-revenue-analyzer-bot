@@ -19,6 +19,11 @@ public class GetUserInfoHandler extends InvocableCommandHandler {
     }
 
     @Override
+    public String getDescription() {
+        return "Показать информацию о текущем пользователе";
+    }
+
+    @Override
     public List<BotApiMethod<?>> handle(Update update) {
         long telegramUserId = TelegramUpdateUtils.getUserId(update);
 
