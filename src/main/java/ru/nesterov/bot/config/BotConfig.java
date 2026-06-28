@@ -1,9 +1,9 @@
 package ru.nesterov.bot.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -21,12 +21,14 @@ public class BotConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public RestClient restClient(RestClient.Builder builder, RevenueAnalyzerProperties properties) {
+        return builder
+                .baseUrl(properties.getUrl())
+                .build();
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
