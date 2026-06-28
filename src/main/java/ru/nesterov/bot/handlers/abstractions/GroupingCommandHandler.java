@@ -6,7 +6,6 @@ import ru.nesterov.bot.dto.GetUserRequest;
 import ru.nesterov.bot.dto.GetUserResponse;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -18,10 +17,7 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
 
     protected GroupingCommandHandler(List<InvocableCommandHandler> groupedCommandHandler) {
         this.groupedCommandHandlersNames = groupedCommandHandler.stream()
-                .sorted(
-                        Comparator.comparingInt(InvocableCommandHandler::getOrder)
-                                .thenComparing(InvocableCommandHandler::getCommand)
-                )
+                .sorted(InvocableCommandHandler.DEFAULT_COMPARATOR)
                 .map(InvocableCommandHandler::getCommand)
                 .toList();
     }
@@ -53,5 +49,9 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
     public boolean isApplicable(Update update) {
         return update.hasMessage()
                 && getCommand().equals(update.getMessage().getText());
+    }
+
+    public List<String> getGroupedCommandHandlersNames() {
+        return List.of(groupedCommandHandlersNames.toArray(String[]::new));
     }
 }

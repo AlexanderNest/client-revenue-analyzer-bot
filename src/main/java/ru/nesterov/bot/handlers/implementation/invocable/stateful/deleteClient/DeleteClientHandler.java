@@ -59,4 +59,9 @@ public class DeleteClientHandler extends StatefulCommandHandler<State, DeleteCli
     private List<BotApiMethod<?>> handleDeleteCanceling(Update update) {
         return editMessage(TelegramUpdateUtils.getChatId(update), TelegramUpdateUtils.getMessageId(update), "Пользователь не удален.", null);
     }
+
+    @Override
+    public String getDescription() {
+        return "Удаление выбранного клиента из Вашей базы";
+    }
 }

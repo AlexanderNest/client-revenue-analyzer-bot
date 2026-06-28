@@ -120,4 +120,9 @@ public class UpdateClientHandler extends StatefulCommandHandler<State, UpdateCli
                 "Номер телефона: " + response.getPhone()
         );
     }
+
+    @Override
+    public String getDescription() {
+        return "Изменение данных существующего клиента: актуализация тарифа, телефона или описания";
+    }
 }

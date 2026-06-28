@@ -94,4 +94,9 @@ public class GetClientStatisticHandler extends StatefulCommandHandler<State, NoM
                 "─────────────────────────────" + "\n" +
                 String.format("%s %s", "Суммарный доход:", totalIncome) + "\n";
     }
+
+    @Override
+    public String getDescription() {
+        return "Глубокая аналитика по конкретному клиенту: отработанные часы, отмены и суммарный доход.";
+    }
 }

@@ -25,4 +25,5 @@ public interface CommandHandler {
     default Priority getPriority() {
         return Priority.NORMAL;
     }
+
 }

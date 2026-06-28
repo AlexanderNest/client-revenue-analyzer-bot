@@ -58,11 +58,18 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
      * @param keyboardMarkup - если в сообщении нужно добавить клавиатуру
      */
     public List<BotApiMethod<?>> editMessage(long chatId, int messageId, String text, @Nullable InlineKeyboardMarkup keyboardMarkup) {
+        return editMessage(chatId, messageId, text, keyboardMarkup, null);
+    }
+
+    public List<BotApiMethod<?>> editMessage(long chatId, int messageId, String text,
+                                             @Nullable InlineKeyboardMarkup keyboardMarkup,
+                                             @Nullable String parseMode) {
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(chatId);
         editMessageText.setMessageId(messageId);
         editMessageText.setText(text);
         editMessageText.setReplyMarkup(keyboardMarkup);
+        editMessageText.setParseMode(parseMode);
 
         return List.of(editMessageText);
     }

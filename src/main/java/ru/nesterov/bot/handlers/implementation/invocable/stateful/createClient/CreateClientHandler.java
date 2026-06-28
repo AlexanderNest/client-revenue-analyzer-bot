@@ -27,6 +27,11 @@ public class CreateClientHandler extends StatefulCommandHandler<State, CreateCli
         return "Добавить клиента";
     }
 
+    @Override
+    public String getDescription() {
+        return "Регистрация нового клиента: установка имени, тарифа, контактных данных.";
+    }
+
     public CreateClientHandler() {
         super(State.STARTED, CreateClientRequest.class);
     }
@@ -103,5 +108,6 @@ public class CreateClientHandler extends StatefulCommandHandler<State, CreateCli
 
         return buttonCallback.getValue();
     }
+
 }
 

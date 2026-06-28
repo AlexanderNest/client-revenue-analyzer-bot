@@ -31,6 +31,11 @@ public class GetUnpaidEventsHandler extends InvocableCommandHandler {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), message);
     }
 
+    @Override
+    public String getDescription() {
+        return "Поиск встреч, по которым еще не была зафиксированна оплата.";
+    }
+
     private String formatMessage(List<GetUnpaidEventsResponse> events) {
         StringBuilder message = new StringBuilder("Неоплаченные события:\n");
         for (GetUnpaidEventsResponse event : events) {

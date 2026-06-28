@@ -24,6 +24,11 @@ public class ClientOperationGroupHandler extends GroupingCommandHandler {
     }
 
     @Override
+    public String getDescription() {
+        return "Инструменты для редактирования списка клиентов";
+    }
+
+    @Override
     public int getOrder() {
         return 4;
     }

@@ -17,9 +17,7 @@ import ru.nesterov.bot.integration.ClientRevenueAnalyzerIntegrationClient;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Отображает кнопки для управления ботом
@@ -43,6 +41,11 @@ public class UpdateUserControlButtonsHandler extends InvocableCommandHandler {
     @Override
     public Priority getPriority() {
         return Priority.HIGHEST;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Обновление кнопок управления и возврат в главное меню";
     }
 
     @Override
@@ -102,7 +105,7 @@ public class UpdateUserControlButtonsHandler extends InvocableCommandHandler {
     private List<GroupingCommandHandler> getHandlersDisplayedForCurrentUser(Update update) {
         return sendingMessageCommandHandlers.stream()
                 .filter(handler -> handler.isDisplayed(update))
-                .sorted(Comparator.comparingInt(GroupingCommandHandler::getOrder))
-                .collect(Collectors.toList());
+                .sorted(InvocableCommandHandler.DEFAULT_COMPARATOR)
+                .toList();
     }
 }

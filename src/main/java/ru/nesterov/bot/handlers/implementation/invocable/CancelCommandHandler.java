@@ -35,4 +35,9 @@ public class CancelCommandHandler extends InvocableCommandHandler {
     public String getCommand() {
         return "/cancel";
     }
+
+    @Override
+    public String getDescription() {
+        return "Сброс текущего действия и возврат в главное меню.";
+    }
 }

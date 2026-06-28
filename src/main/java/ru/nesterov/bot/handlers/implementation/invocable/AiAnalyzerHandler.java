@@ -25,4 +25,9 @@ public class AiAnalyzerHandler extends InvocableCommandHandler {
 
         return getPlainSendMessage(update.getMessage().getChatId(), response.getContent());
     }
+
+    @Override
+    public String getDescription() {
+        return "Анализирует Ваши доходы и расходы с помощью ИИ и дает советы.";
+    }
 }

@@ -20,6 +20,12 @@ public class UserOperationGroupHandler extends GroupingCommandHandler {
         return "Действия пользователя";
     }
 
+
+    @Override
+    public String getDescription() {
+        return "Анализ продуктивности и сервисные функции";
+    }
+
     @Override
     public int getOrder() {
         return 3;
