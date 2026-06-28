@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.ParseMode;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -58,7 +59,7 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
                         TelegramUpdateUtils.getMessageId(update),
                         "Выберите интересующий Вас раздел:",
                         getGroupsKeyboard(update),
-                        "Markdown");
+                        ParseMode.MARKDOWN);
             }
             if (callbackValue.startsWith(CATEGORY_PREFIX)) {
                 String groupName = callbackValue.substring(CATEGORY_PREFIX.length());
@@ -66,7 +67,7 @@ public class BotInstructionsCommandHandler extends InvocableCommandHandler {
                         TelegramUpdateUtils.getMessageId(update),
                         getCategoryDescription(groupName),
                         getBackKeyboard(),
-                        "Markdown");
+                        ParseMode.MARKDOWN);
             }
         }
         return getReplyKeyboard(chatId, "Привет! Я помогу тебе освоиться! Выбери интересующий раздел:", getGroupsKeyboard(update));

@@ -69,14 +69,10 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
         editMessageText.setMessageId(messageId);
         editMessageText.setText(text);
         editMessageText.setReplyMarkup(keyboardMarkup);
-        if (parseMode != null) {
-            editMessageText.setParseMode(parseMode);
-        }
+        editMessageText.setParseMode(parseMode);
 
         return List.of(editMessageText);
     }
-
-
 
     /**
      * Метод для отправки всплывающего сообщения. Оно появится на некоторое время поверх чата, потом исчезнет

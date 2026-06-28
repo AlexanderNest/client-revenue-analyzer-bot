@@ -27,6 +27,7 @@ public abstract class InvocableCommandHandler extends SendingMessageCommandHandl
      * Команда, которая вызовет обработчик
      */
     public abstract String getCommand();
+
     /**
      * краткое описание функционала обработчика для формирования справки пользователю
      */

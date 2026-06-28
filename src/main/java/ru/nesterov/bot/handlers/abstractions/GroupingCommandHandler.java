@@ -52,6 +52,6 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
     }
 
     public List<String> getGroupedCommandHandlersNames() {
-        return List.copyOf(groupedCommandHandlersNames);
+        return List.of(groupedCommandHandlersNames.toArray(String[]::new));
     }
 }
