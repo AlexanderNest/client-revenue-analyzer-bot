@@ -73,6 +73,15 @@ public class ClientRevenueAnalyzerIntegrationClient {
 
         return get(String.valueOf(userId), requestParams, revenueAnalyzerProperties.getGetClientStatisticUrl(), GetClientStatisticResponse.class).getBody();
     }
+    public byte[] getClientPdfReport(long userId, String clientName, LocalDateTime startDate, LocalDateTime endDate){
+        LinkedMultiValueMap<String,String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("clientName", clientName);
+        requestParams.add("startDate", startDate.toString());
+        requestParams.add("endDate", endDate.toString());
+        return get(String.valueOf(userId), requestParams,
+                revenueAnalyzerProperties.getGetClientPdfReportUrl(),
+                byte[].class).getBody();
+    }
 
     public GetYearBusynessStatisticsResponse getYearBusynessStatistics(long userId, int year) {
         GetForYearRequest getForYearRequest = new GetForYearRequest();

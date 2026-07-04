@@ -1,4 +1,4 @@
-package ru.nesterov.bot.handlers.implementation.invocable.stateful.GetPdfPeport;
+package ru.nesterov.bot.handlers.implementation.invocable.stateful.GetPdfReport;
 
 public enum State {
     STARTED,

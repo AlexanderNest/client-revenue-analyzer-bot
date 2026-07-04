@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -25,12 +26,14 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
     private final ExecutorService executorService;
     private final KeyboardUpdateService keyboardUpdateService;
     private final UpdateUserControlButtonsHandler updateUserControlButtonsHandler;
+    private final TelegramDocumentBuffer documentBuffer;
 
 
     public RevenueAnalyzerBot(BotProperties botProperties, HandlersService handlersService,
                               ExecutorService executorService,
                               UpdateUserControlButtonsHandler updateUserControlButtonsHandler,
-                              KeyboardUpdateService keyboardUpdateService) {
+                              KeyboardUpdateService keyboardUpdateService,
+                              TelegramDocumentBuffer documentBuffer) {
         super(botProperties.getApiToken());
 
         this.handlersService = handlersService;
@@ -38,6 +41,7 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         this.executorService = executorService;
         this.updateUserControlButtonsHandler = updateUserControlButtonsHandler;
         this.keyboardUpdateService = keyboardUpdateService;
+        this.documentBuffer = documentBuffer;
     }
 
     @Override
@@ -69,8 +73,20 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
             handlersService.resetFinishedHandlers(chatId);
         }
 
+        SendDocument pendingDocument = documentBuffer.poll();
+        if (pendingDocument != null) {
+            try {
+                log.debug("Отправка документа: {}", pendingDocument);
+                execute(pendingDocument);
+                log.debug("Документ отправлен");
+            } catch (TelegramApiException e) {
+                log.error("Ошибка отправки документа", e);
+            }
+        }
+
         sendMessages = enrichWithCommandButtons(sendMessages, update);
         sendMessage(sendMessages);
+
     }
 
     private List<BotApiMethod<?>> enrichWithCommandButtons(List<BotApiMethod<?>> sendMessages, Update update) {
