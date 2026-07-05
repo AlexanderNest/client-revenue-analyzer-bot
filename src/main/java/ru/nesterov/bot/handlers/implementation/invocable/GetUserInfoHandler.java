@@ -19,7 +19,7 @@ public class GetUserInfoHandler extends InvocableCommandHandler {
     }
 
     @Override
-    public List<BotApiMethod<?>> handle(Update update) {
+    public List<PartialBotApiMethod<?>> handle(Update update) {
         long telegramUserId = TelegramUpdateUtils.getUserId(update);
 
         GetUserRequest request = new GetUserRequest();

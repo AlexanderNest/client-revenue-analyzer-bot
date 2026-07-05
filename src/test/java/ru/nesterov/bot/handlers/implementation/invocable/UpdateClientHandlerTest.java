@@ -47,7 +47,7 @@ public class UpdateClientHandlerTest extends RegisteredUserHandlerTest {
     @Test
     void shouldReturnNoClientsMessage() {
         Update update = createUpdateWithMessage(handler.getCommand());
-        List<BotApiMethod<?>> handle = handler.handle(update);
+        List<PartialBotApiMethod<?>> handle = handler.handle(update);
         assertEquals(1, handle.size());
         SendMessage sendMessage = (SendMessage) handle.get(0);
         assertEquals("Нет доступных клиентов", sendMessage.getText());
@@ -59,7 +59,7 @@ public class UpdateClientHandlerTest extends RegisteredUserHandlerTest {
         when(client.getActiveClients(anyLong())).thenReturn(clients);
 
         Update update = createUpdateWithMessage(handler.getCommand());
-        List<BotApiMethod<?>> step1Result = handler.handle(update);
+        List<PartialBotApiMethod<?>> step1Result = handler.handle(update);
 
         assertEquals(1, step1Result.size());
         SendMessage clientSelectionMessage = (SendMessage) step1Result.get(0);
@@ -72,7 +72,7 @@ public class UpdateClientHandlerTest extends RegisteredUserHandlerTest {
         assertEquals("Макс", rows.get(1).get(0).getText());
 
         Update selectUpdate = createUpdateWithCallbackQuery("Макс");
-        List<BotApiMethod<?>> step2Result = handler.handle(selectUpdate);
+        List<PartialBotApiMethod<?>> step2Result = handler.handle(selectUpdate);
 
         assertEquals(1, step2Result.size());
         SendMessage nameConfirmationMessage = (SendMessage) step2Result.get(0);
@@ -87,21 +87,21 @@ public class UpdateClientHandlerTest extends RegisteredUserHandlerTest {
         assertEquals("Нет", confirmRows.get(0).get(1).getText());
 
         Update noNameUpdate = createUpdateWithCallbackQuery("Нет");
-        List<BotApiMethod<?>> step3Result = handler.handle(noNameUpdate);
+        List<PartialBotApiMethod<?>> step3Result = handler.handle(noNameUpdate);
 
         assertEquals(1, step3Result.size());
         EditMessageText priceConfirmationMessage = (EditMessageText) step3Result.get(0);
         assertEquals("Обновить стоимость за час клиента?", priceConfirmationMessage.getText());
 
         Update noPriceUpdate = createUpdateWithCallbackQuery("Нет");
-        List<BotApiMethod<?>> step4Result = handler.handle(noPriceUpdate);
+        List<PartialBotApiMethod<?>> step4Result = handler.handle(noPriceUpdate);
 
         assertEquals(1, step4Result.size());
         EditMessageText descConfirmationMessage = (EditMessageText) step4Result.get(0);
         assertEquals("Обновить описание клиента?", descConfirmationMessage.getText());
 
         Update noDescUpdate = createUpdateWithCallbackQuery("Нет");
-        List<BotApiMethod<?>> step5Result = handler.handle(noDescUpdate);
+        List<PartialBotApiMethod<?>> step5Result = handler.handle(noDescUpdate);
 
         assertEquals(1, step5Result.size());
         EditMessageText phoneConfirmationMessage = (EditMessageText) step5Result.get(0);
@@ -111,7 +111,7 @@ public class UpdateClientHandlerTest extends RegisteredUserHandlerTest {
         when(client.updateClient(eq(1L), any())).thenReturn(updateResponse);
 
         Update noPhoneUpdate = createUpdateWithCallbackQuery("Нет");
-        List<BotApiMethod<?>> step6Result = handler.handle(noPhoneUpdate);
+        List<PartialBotApiMethod<?>> step6Result = handler.handle(noPhoneUpdate);
 
         assertEquals(1, step6Result.size());
         EditMessageText successMessage = (EditMessageText) step6Result.get(0);
@@ -139,56 +139,56 @@ public class UpdateClientHandlerTest extends RegisteredUserHandlerTest {
         handler.handle(selectUpdate);
 
         Update yesNameUpdate = createUpdateWithCallbackQuery("Да");
-        List<BotApiMethod<?>> step3Result = handler.handle(yesNameUpdate);
+        List<PartialBotApiMethod<?>> step3Result = handler.handle(yesNameUpdate);
 
         assertEquals(1, step3Result.size());
         SendMessage askNameMessage = (SendMessage) step3Result.get(0);
         assertEquals("Введите новое имя:", askNameMessage.getText());
 
         Update newNameUpdate = createUpdateWithTextMessage("Максим");
-        List<BotApiMethod<?>> step4Result = handler.handle(newNameUpdate);
+        List<PartialBotApiMethod<?>> step4Result = handler.handle(newNameUpdate);
 
         assertEquals(1, step4Result.size());
         SendMessage priceConfirmationMessage = (SendMessage) step4Result.get(0);
         assertEquals("Обновить стоимость за час клиента?", priceConfirmationMessage.getText());
 
         Update yesPriceUpdate = createUpdateWithCallbackQuery("Да");
-        List<BotApiMethod<?>> step5Result = handler.handle(yesPriceUpdate);
+        List<PartialBotApiMethod<?>> step5Result = handler.handle(yesPriceUpdate);
 
         assertEquals(1, step5Result.size());
         SendMessage askPriceMessage = (SendMessage) step5Result.get(0);
         assertEquals("Введите новую стоимость клиента за час: ", askPriceMessage.getText());
 
         Update newPriceUpdate = createUpdateWithTextMessage("1200");
-        List<BotApiMethod<?>> step6Result = handler.handle(newPriceUpdate);
+        List<PartialBotApiMethod<?>> step6Result = handler.handle(newPriceUpdate);
 
         assertEquals(1, step6Result.size());
         SendMessage descConfirmationMessage = (SendMessage) step6Result.get(0);
         assertEquals("Обновить описание клиента?", descConfirmationMessage.getText());
 
         Update yesDescUpdate = createUpdateWithCallbackQuery("Да");
-        List<BotApiMethod<?>> step7Result = handler.handle(yesDescUpdate);
+        List<PartialBotApiMethod<?>> step7Result = handler.handle(yesDescUpdate);
 
         assertEquals(1, step7Result.size());
         SendMessage askDescMessage = (SendMessage) step7Result.get(0);
         assertEquals("Введите новое описание клиента: ", askDescMessage.getText());
 
         Update newDescUpdate = createUpdateWithTextMessage("Новое описание");
-        List<BotApiMethod<?>> step8Result = handler.handle(newDescUpdate);
+        List<PartialBotApiMethod<?>> step8Result = handler.handle(newDescUpdate);
 
         assertEquals(1, step8Result.size());
         SendMessage phoneConfirmationMessage = (SendMessage) step8Result.get(0);
         assertEquals("Обновить номер телефона клиента?", phoneConfirmationMessage.getText());
 
         Update yesPhoneUpdate = createUpdateWithCallbackQuery("Да");
-        List<BotApiMethod<?>> step9Result = handler.handle(yesPhoneUpdate);
+        List<PartialBotApiMethod<?>> step9Result = handler.handle(yesPhoneUpdate);
 
         assertEquals(1, step9Result.size());
         SendMessage askPhoneMessage = (SendMessage) step9Result.get(0);
         assertEquals("Введите новый номер телефона: ", askPhoneMessage.getText());
 
         Update newPhoneUpdate = createUpdateWithTextMessage("+79998887766");
-        List<BotApiMethod<?>> step10Result = handler.handle(newPhoneUpdate);
+        List<PartialBotApiMethod<?>> step10Result = handler.handle(newPhoneUpdate);
 
         assertEquals(1, step10Result.size());
         SendMessage successMessage = (SendMessage) step10Result.get(0);

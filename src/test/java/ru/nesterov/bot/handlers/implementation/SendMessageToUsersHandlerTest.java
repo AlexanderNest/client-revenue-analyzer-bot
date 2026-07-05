@@ -49,7 +49,7 @@ public class SendMessageToUsersHandlerTest extends RegisteredUserHandlerTest {
         Update update1 = new Update();
         update1.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
+        List<PartialBotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
         SendMessage sendMessage = (SendMessage) (botApiMethod.get(0));
         Assertions.assertEquals("Введите текст рассылки", sendMessage.getText());
         Assertions.assertInstanceOf(SendMessage.class, sendMessage);
@@ -120,7 +120,7 @@ public class SendMessageToUsersHandlerTest extends RegisteredUserHandlerTest {
         Update update1 = new Update();
         update1.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
+        List<PartialBotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
         SendMessage sendMessage = (SendMessage) (botApiMethod.get(0));
         Assertions.assertEquals("Введите текст рассылки", sendMessage.getText());
         Assertions.assertInstanceOf(SendMessage.class, sendMessage);

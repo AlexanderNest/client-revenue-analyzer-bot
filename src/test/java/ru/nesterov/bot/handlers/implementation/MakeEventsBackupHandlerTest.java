@@ -89,7 +89,7 @@ class MakeEventsBackupHandlerTest extends RegisteredUserHandlerTest {
         Update firstUpdate = new Update();
         firstUpdate.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
@@ -169,7 +169,7 @@ class MakeEventsBackupHandlerTest extends RegisteredUserHandlerTest {
         Update firstUpdate = new Update();
         firstUpdate.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
@@ -250,7 +250,7 @@ class MakeEventsBackupHandlerTest extends RegisteredUserHandlerTest {
         Update firstUpdate = new Update();
         firstUpdate.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);

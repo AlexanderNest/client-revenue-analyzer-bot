@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.config.BotProperties;
 import ru.nesterov.bot.handlers.implementation.invocable.UpdateUserControlButtonsHandler;
@@ -25,7 +26,7 @@ public class KeyboardUpdateService {
     private final UpdateUserControlButtonsHandler updateUserControlButtonsHandler;
 
     @NotNull
-    public List<BotApiMethod<?>> getUpdateKeyboard(Update update) {
+    public List<PartialBotApiMethod<?>> getUpdateKeyboard(Update update) {
         if (!shouldUpdateKeyboard(TelegramUpdateUtils.getChatId(update))) {
             return List.of();
         }

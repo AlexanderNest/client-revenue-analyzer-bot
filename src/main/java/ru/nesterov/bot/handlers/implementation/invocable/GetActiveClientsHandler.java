@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation.invocable;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.GetActiveClientResponse;
 import ru.nesterov.bot.handlers.abstractions.InvocableCommandHandler;
@@ -19,7 +19,7 @@ public class GetActiveClientsHandler extends InvocableCommandHandler {
     }
 
     @Override
-    public List<BotApiMethod<?>> handle(Update update) {
+    public List<PartialBotApiMethod<?>> handle(Update update) {
         long chatId = TelegramUpdateUtils.getChatId(update);
         List<GetActiveClientResponse> activeClientResponseList = client.getActiveClients(chatId);
 

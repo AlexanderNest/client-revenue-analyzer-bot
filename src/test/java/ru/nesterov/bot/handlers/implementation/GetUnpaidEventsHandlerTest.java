@@ -41,7 +41,7 @@ public class GetUnpaidEventsHandlerTest extends RegisteredUserHandlerTest {
         update.setMessage(message);
 
         when(client.getUnpaidEvents(user.getId())).thenReturn(Collections.emptyList());
-        List<BotApiMethod<?>> response = getUnpaidEventsHandler.handle(update);
+        List<PartialBotApiMethod<?>> response = getUnpaidEventsHandler.handle(update);
         Assertions.assertInstanceOf(SendMessage.class, response.get(0));
         SendMessage sendMessage = (SendMessage) response.get(0);
         Assertions.assertEquals("Нет неоплаченных событий", sendMessage.getText());
@@ -72,7 +72,7 @@ public class GetUnpaidEventsHandlerTest extends RegisteredUserHandlerTest {
         unpaidEvents.add(getUnpaidEventsResponse2);
         when(client.getUnpaidEvents(user.getId())).thenReturn(unpaidEvents);
 
-        List<BotApiMethod<?>> response = getUnpaidEventsHandler.handle(update);
+        List<PartialBotApiMethod<?>> response = getUnpaidEventsHandler.handle(update);
         Assertions.assertInstanceOf(SendMessage.class, response.get(0));
         SendMessage sendMessage = (SendMessage) response.get(0);
         String expectedMessage = "Неоплаченные события:\n" +

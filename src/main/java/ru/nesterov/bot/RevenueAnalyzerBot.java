@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -26,14 +27,12 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
     private final ExecutorService executorService;
     private final KeyboardUpdateService keyboardUpdateService;
     private final UpdateUserControlButtonsHandler updateUserControlButtonsHandler;
-    private final TelegramDocumentBuffer documentBuffer;
 
 
     public RevenueAnalyzerBot(BotProperties botProperties, HandlersService handlersService,
                               ExecutorService executorService,
                               UpdateUserControlButtonsHandler updateUserControlButtonsHandler,
-                              KeyboardUpdateService keyboardUpdateService,
-                              TelegramDocumentBuffer documentBuffer) {
+                              KeyboardUpdateService keyboardUpdateService) {
         super(botProperties.getApiToken());
 
         this.handlersService = handlersService;
@@ -41,7 +40,6 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         this.executorService = executorService;
         this.updateUserControlButtonsHandler = updateUserControlButtonsHandler;
         this.keyboardUpdateService = keyboardUpdateService;
-        this.documentBuffer = documentBuffer;
     }
 
     @Override
@@ -62,7 +60,7 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
 
         log.debug("Выбранный CommandHandler = {}", commandHandler.getClass().getSimpleName());
 
-        List<BotApiMethod<?>> sendMessages;
+        List<PartialBotApiMethod<?>> sendMessages;
 
         try {
             sendMessages = commandHandler.handle(update);
@@ -73,24 +71,13 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
             handlersService.resetFinishedHandlers(chatId);
         }
 
-        SendDocument pendingDocument = documentBuffer.poll();
-        if (pendingDocument != null) {
-            try {
-                log.debug("Отправка документа: {}", pendingDocument);
-                execute(pendingDocument);
-                log.debug("Документ отправлен");
-            } catch (TelegramApiException e) {
-                log.error("Ошибка отправки документа", e);
-            }
-        }
-
         sendMessages = enrichWithCommandButtons(sendMessages, update);
         sendMessage(sendMessages);
 
     }
 
-    private List<BotApiMethod<?>> enrichWithCommandButtons(List<BotApiMethod<?>> sendMessages, Update update) {
-        List<BotApiMethod<?>> mutableList = new ArrayList<>(sendMessages);
+    private List<PartialBotApiMethod<?>> enrichWithCommandButtons(List<PartialBotApiMethod<?>> sendMessages, Update update) {
+        List<PartialBotApiMethod<?>> mutableList = new ArrayList<>(sendMessages);
         mutableList.addAll(keyboardUpdateService.getUpdateKeyboard(update));
 
         return mutableList;
@@ -101,7 +88,7 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         return botProperties.getUsername();
     }
 
-    private List<BotApiMethod<?>> buildTextMessage(Update update, String text) {
+    private List<PartialBotApiMethod<?>> buildTextMessage(Update update, String text) {
         SendMessage message = new SendMessage();
         message.setChatId(TelegramUpdateUtils.getChatId(update));
         message.setText(text);
@@ -109,11 +96,15 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         return List.of(message);
     }
 
-    private void sendMessage(List<BotApiMethod<?>> sendMessages) {
-        for (BotApiMethod<?> message : sendMessages) {
+    private void sendMessage(List<PartialBotApiMethod<?>> sendMessages) {
+        for (PartialBotApiMethod<?> message : sendMessages) {
             try {
                 log.debug("Отправка сообщения с содержимым: {}", message);
-                execute(message);
+                if (message instanceof SendDocument sendDocument) {
+                    execute(sendDocument);
+                } else {
+                    execute((BotApiMethod<?>) message);
+                }
                 log.debug("Отправлено");
             } catch (TelegramApiException e) {
                 log.error("Ошибка отправки сообщения", e);

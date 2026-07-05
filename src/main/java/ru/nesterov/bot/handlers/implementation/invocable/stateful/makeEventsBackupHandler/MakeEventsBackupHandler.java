@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.makeEventsBac
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -32,7 +32,7 @@ public class MakeEventsBackupHandler extends StatefulCommandHandler<State, MakeE
                 .addTransition(State.WAITING_FOR_CONFIRMATION, Action.CALLBACK_FALSE, State.FINISH, this::getFinishMessageWithoutBackup);
     }
 
-    private List<BotApiMethod<?>> requestConfirmation(Update update) {
+    private List<PartialBotApiMethod<?>> requestConfirmation(Update update) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
         List<InlineKeyboardButton> rowInline = new ArrayList<>();
@@ -48,7 +48,7 @@ public class MakeEventsBackupHandler extends StatefulCommandHandler<State, MakeE
         );
     }
 
-    private List<BotApiMethod<?>> getFinishMessageWithoutBackup(Update update) {
+    private List<PartialBotApiMethod<?>> getFinishMessageWithoutBackup(Update update) {
         return editMessage(
                 TelegramUpdateUtils.getChatId(update),
                 TelegramUpdateUtils.getMessageId(update),
@@ -56,7 +56,7 @@ public class MakeEventsBackupHandler extends StatefulCommandHandler<State, MakeE
                 null);
     }
 
-    private List<BotApiMethod<?>> makeEventsBackup(Update update) {
+    private List<PartialBotApiMethod<?>> makeEventsBackup(Update update) {
 
         MakeEventsBackupResponse response = client.makeEventsBackup(TelegramUpdateUtils.getChatId(update));
 

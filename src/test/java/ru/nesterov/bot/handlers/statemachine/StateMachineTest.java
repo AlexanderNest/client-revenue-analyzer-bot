@@ -24,7 +24,7 @@ public class StateMachineTest {
 
     @Test
     void test() {
-        Function<Update, List<BotApiMethod<?>>> functionForTransition = update -> List.of(new SendMessage("1", "Текст"));
+        Function<Update, List<PartialBotApiMethod<?>>> functionForTransition = update -> List.of(new SendMessage("1", "Текст"));
         stateMachine.addTransition(StateTest.STARTED, Action.COMMAND_INPUT, StateTest.WAITING_INPUT, functionForTransition);
         Assertions.assertEquals(StateTest.STARTED, stateMachine.getCurrentState());
 
@@ -32,7 +32,7 @@ public class StateMachineTest {
         Assertions.assertNotNull(nextStateFunction);
         Assertions.assertEquals(StateTest.WAITING_INPUT, nextStateFunction.getState());
 
-        List<BotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
+        List<PartialBotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
         Assertions.assertInstanceOf(SendMessage.class, response.get(0));
         Assertions.assertEquals("Текст", ((SendMessage) response.get(0)).getText());
 

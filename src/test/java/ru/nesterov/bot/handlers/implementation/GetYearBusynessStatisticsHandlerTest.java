@@ -29,14 +29,14 @@ class GetYearBusynessStatisticsHandlerTest extends RegisteredUserHandlerTest {
         Update update = createUpdateWithMessage("Анализ занятости за год");
         CommandHandler commandHandler = handlerService.getHandler(update);
 
-        List<BotApiMethod<?>> command = commandHandler.handle(update);
+        List<PartialBotApiMethod<?>> command = commandHandler.handle(update);
 
         assertInstanceOf(SendMessage.class, command.get(0));
 
         SendMessage sendMessage = (SendMessage) command.get(0);
         assertEquals("Введите год для расчета занятости", sendMessage.getText());
 
-        List<BotApiMethod<?>> wrongYearInput = commandHandler.handle(createUpdateWithMessage("fff"));
+        List<PartialBotApiMethod<?>> wrongYearInput = commandHandler.handle(createUpdateWithMessage("fff"));
         SendMessage wrongYear = (SendMessage) wrongYearInput.get(0);
         assertEquals("Введите корректный год", wrongYear.getText());
 
@@ -54,7 +54,7 @@ class GetYearBusynessStatisticsHandlerTest extends RegisteredUserHandlerTest {
 
         when(client.getYearBusynessStatistics(anyLong(), anyInt())).thenReturn(getYearBusynessStatisticsResponse);
 
-        List<BotApiMethod<?>> botApiMethod = commandHandler.handle(createUpdateWithMessage("2024"));
+        List<PartialBotApiMethod<?>> botApiMethod = commandHandler.handle(createUpdateWithMessage("2024"));
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendStatistics = (SendMessage) botApiMethod.get(0);
 

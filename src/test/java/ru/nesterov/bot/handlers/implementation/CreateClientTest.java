@@ -82,7 +82,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());
@@ -181,7 +181,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());
@@ -275,7 +275,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());
@@ -374,7 +374,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());

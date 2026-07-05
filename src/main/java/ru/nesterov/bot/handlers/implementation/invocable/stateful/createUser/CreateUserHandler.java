@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.createUser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -39,7 +39,7 @@ public class CreateUserHandler extends StatefulCommandHandler<State, CreateUserR
                 .addTransition(State.CANCELLED_CALENDAR_ID_INPUT, Action.ANY_STRING, State.FINISH, this::handleCancelledCalendarIdInput);
     }
 
-    private List<BotApiMethod<?>> handleRegisterCommand(Update update) {
+    private List<PartialBotApiMethod<?>> handleRegisterCommand(Update update) {
         long chatId = TelegramUpdateUtils.getChatId(update);
         if (isUserExists(String.valueOf(chatId))) {
             return buildFirstMessage(chatId);
@@ -48,14 +48,14 @@ public class CreateUserHandler extends StatefulCommandHandler<State, CreateUserR
         }
     }
 
-    private List<BotApiMethod<?>> buildFirstMessage(long chatId) {
+    private List<PartialBotApiMethod<?>> buildFirstMessage(long chatId) {
         return getPlainSendMessage(chatId,
                 "Для начала работы необходимо зарегистрироваться. Следуйте инструкциям ниже.",
                 "Введите ID основного календаря:"
         );
     }
 
-    private List<BotApiMethod<?>> handleMainCalendarInput(Update update) {
+    private List<PartialBotApiMethod<?>> handleMainCalendarInput(Update update) {
         getStateMachine(update).getMemory().setUserIdentifier(String.valueOf(TelegramUpdateUtils.getChatId(update)));
         getStateMachine(update).getMemory().setMainCalendarId(update.getMessage().getText());
 
@@ -71,12 +71,12 @@ public class CreateUserHandler extends StatefulCommandHandler<State, CreateUserR
                 "об отмененных мероприятиях с использованием второго календаря?", keyboardMarkup);
     }
 
-    private List<BotApiMethod<?>> handleCancelledCalendarEnabledInput(Update update) {
+    private List<PartialBotApiMethod<?>> handleCancelledCalendarEnabledInput(Update update) {
         getStateMachine(update).getMemory().setCancelledCalendarEnabled(Boolean.parseBoolean(getButtonCallbackValue(update)));
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите ID календаря с отмененными мероприятиями:");
     }
 
-    private List<BotApiMethod<?>> handleCancelledCalendarIdInput(Update update) {
+    private List<PartialBotApiMethod<?>> handleCancelledCalendarIdInput(Update update) {
         getStateMachine(update).getMemory().setCancelledCalendarId(update.getMessage().getText());
 
         return registerUser(update);
@@ -89,7 +89,7 @@ public class CreateUserHandler extends StatefulCommandHandler<State, CreateUserR
         return client.getUserByUsername(request) == null;
     }
 
-    private List<BotApiMethod<?>> registerUser(Update update) {
+    private List<PartialBotApiMethod<?>> registerUser(Update update) {
         CreateUserRequest request = getStateMachine(update).getMemory();
         request.setSource("telegram");
         CreateUserResponse response = client.createUser(request);

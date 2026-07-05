@@ -45,7 +45,7 @@ public abstract class GroupingCommandHandler extends InvocableCommandHandler {
     }
 
     @Override
-    public List<BotApiMethod<?>> handle(Update update) {
+    public List<PartialBotApiMethod<?>> handle(Update update) {
         return getOneColumnInlineKeyboard(groupedCommandHandlersNames, update, getCommand());
     }
 

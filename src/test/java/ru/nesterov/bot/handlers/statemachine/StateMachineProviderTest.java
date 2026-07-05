@@ -39,7 +39,7 @@ public class StateMachineProviderTest {
         Assertions.assertNotNull(nextStateFunction);
         Assertions.assertEquals(StateTest.WAITING_INPUT, nextStateFunction.getState());
 
-        List<BotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
+        List<PartialBotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
         Assertions.assertInstanceOf(SendMessage.class, response.get(0));
         Assertions.assertEquals("Текст", ((SendMessage) response.get(0)).getText());
     }

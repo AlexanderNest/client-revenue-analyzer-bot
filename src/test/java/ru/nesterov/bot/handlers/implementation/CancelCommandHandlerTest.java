@@ -60,7 +60,7 @@ public class CancelCommandHandlerTest  extends AbstractHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = commandHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = commandHandler.handle(update);
         assertFalse(botApiMethod.isEmpty());
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 

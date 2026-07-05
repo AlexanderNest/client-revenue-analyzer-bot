@@ -73,7 +73,7 @@ class GetMonthStatisticsHandlerTestTest extends RegisteredUserHandlerTest {
 
         update.setCallbackQuery(callbackQuery);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
 
@@ -102,7 +102,7 @@ class GetMonthStatisticsHandlerTestTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
 
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 

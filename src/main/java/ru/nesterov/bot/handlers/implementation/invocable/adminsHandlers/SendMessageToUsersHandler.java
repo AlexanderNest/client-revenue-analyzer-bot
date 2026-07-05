@@ -47,23 +47,23 @@ public class SendMessageToUsersHandler extends StatefulCommandHandler<State, Sen
                 .addTransition(State.WAITING_FOR_CONFIRMATION, Action.CALLBACK_FALSE, State.FINISH, this::sendMessageToUsers);
     }
 
-    public List<BotApiMethod<?>> handleStartMessage(Update update) {
+    public List<PartialBotApiMethod<?>> handleStartMessage(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите текст рассылки");
     }
 
-    public List<BotApiMethod<?>> handleUpdatedMessage(Update update) {
+    public List<PartialBotApiMethod<?>> handleUpdatedMessage(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите исправленный текст рассылки");
     }
 
-    public List<BotApiMethod<?>> handleTextInput(Update update) {
+    public List<PartialBotApiMethod<?>> handleTextInput(Update update) {
         getStateMachine(update).getMemory().setMessage(update.getMessage().getText());
         return getApproveKeyBoardMessage(update, "Редактировать сообщение?");
     }
 
-    public List<BotApiMethod<?>> sendMessageToUsers(Update update) {
+    public List<PartialBotApiMethod<?>> sendMessageToUsers(Update update) {
         GetAllUsersByRoleAndSourceResponse response = client.getUsersIdByRoleAndSource(TelegramUpdateUtils.getChatId(update),
                 Role.USER, "telegram");
-        List<BotApiMethod<?>> messages = new ArrayList<>();
+        List<PartialBotApiMethod<?>> messages = new ArrayList<>();
 
         for (String user : response.getUserIds()) {
             try {

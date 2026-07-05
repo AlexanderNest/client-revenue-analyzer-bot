@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.deleteClient;
 
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
@@ -35,18 +35,18 @@ public class DeleteClientHandler extends StatefulCommandHandler<State, DeleteCli
     }
 
     @SneakyThrows
-    public List<BotApiMethod<?>> handleCommandInputAndSendClientNamesKeyboard(Update update) {
+    public List<PartialBotApiMethod<?>> handleCommandInputAndSendClientNamesKeyboard(Update update) {
         return getClientNamesKeyboard(update, "Выберите клиента для удаления:");
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleClientNameAndRequestApprove(Update update) {
+    private List<PartialBotApiMethod<?>> handleClientNameAndRequestApprove(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
         getStateMachine(update).getMemory().setClientName(buttonCallback.getValue());
         return getApproveKeyBoardMessage(update, "Подтвердите удаление");
     }
 
-    private List<BotApiMethod<?>> handleDeleteClient(Update update) {
+    private List<PartialBotApiMethod<?>> handleDeleteClient(Update update) {
         client.deleteClient(TelegramUpdateUtils.getUserId(update), getStateMachine(update).getMemory().getClientName());
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), formatDeleteUserResponse(getStateMachine(update).getMemory().getClientName()));
     }
@@ -56,7 +56,7 @@ public class DeleteClientHandler extends StatefulCommandHandler<State, DeleteCli
                 "Пользователь " + clientName + " успешно удален.");
     }
 
-    private List<BotApiMethod<?>> handleDeleteCanceling(Update update) {
+    private List<PartialBotApiMethod<?>> handleDeleteCanceling(Update update) {
         return editMessage(TelegramUpdateUtils.getChatId(update), TelegramUpdateUtils.getMessageId(update), "Пользователь не удален.", null);
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Component
 public class UndefinedHandler extends SendingMessageCommandHandler {
     @Override
-    public List<BotApiMethod<?>> handle(Update update) {
+    public List<PartialBotApiMethod<?>> handle(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Неизвестная команда");
     }
 

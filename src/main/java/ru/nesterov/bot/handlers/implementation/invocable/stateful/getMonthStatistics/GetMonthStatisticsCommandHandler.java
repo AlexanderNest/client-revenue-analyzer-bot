@@ -66,7 +66,7 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> sendMonthStatistics(Update update) {
+    private List<PartialBotApiMethod<?>> sendMonthStatistics(Update update) {
         long userId = update.getCallbackQuery().getFrom().getId();
         CallbackQuery callbackQuery = update.getCallbackQuery();
         ButtonCallback callback = objectMapper.readValue(callbackQuery.getData(), ButtonCallback.class);
@@ -82,7 +82,7 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> sendMonthKeyboard(Update update) {
+    private List<PartialBotApiMethod<?>> sendMonthKeyboard(Update update) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(TelegramUpdateUtils.getChatId(update)));
         message.setText("Выберите месяц для анализа дохода:");

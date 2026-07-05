@@ -39,7 +39,7 @@ class GetActiveClientsHandlerTest extends RegisteredUserHandlerTest {
 
         when(client.getActiveClients(1L)).thenReturn(getActiveClientsResponseList);
 
-        List<BotApiMethod<?>> result = getActiveClientsHandler.handle(update);
+        List<PartialBotApiMethod<?>> result = getActiveClientsHandler.handle(update);
 
         String expectedMessage =
                 "1. Макс" + System.lineSeparator() +
@@ -60,7 +60,7 @@ class GetActiveClientsHandlerTest extends RegisteredUserHandlerTest {
 
         when(client.getActiveClients(1L)).thenReturn(Collections.emptyList());
 
-        List<BotApiMethod<?>> result = getActiveClientsHandler.handle(update);
+        List<PartialBotApiMethod<?>> result = getActiveClientsHandler.handle(update);
         assertEquals(1, result.size());
         SendMessage sendMessage = (SendMessage) result.get(0);
 
