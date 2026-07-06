@@ -5,7 +5,6 @@ import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -111,7 +110,7 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
         return button;
     }
 
-    protected SendDocument buildSendPdfDocument(long chatId, InputStream inputStream, String fileName) {
+    protected SendDocument buildSendDocument(long chatId, InputStream inputStream, String fileName) {
         SendDocument sendDocument = new SendDocument();
         sendDocument.setChatId(chatId);
         sendDocument.setDocument(new InputFile(inputStream, fileName));

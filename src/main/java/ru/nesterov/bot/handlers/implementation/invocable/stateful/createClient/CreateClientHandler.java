@@ -3,7 +3,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.createClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.CreateClientRequest;
 import ru.nesterov.bot.dto.CreateClientResponse;

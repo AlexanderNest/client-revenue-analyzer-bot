@@ -1,7 +1,7 @@
 package ru.nesterov.bot.handlers.implementation;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.handlers.abstractions.SendingMessageCommandHandler;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;

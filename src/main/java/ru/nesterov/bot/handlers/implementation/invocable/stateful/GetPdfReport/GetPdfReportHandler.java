@@ -2,8 +2,6 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.GetPdfReport;
 
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
-import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
@@ -11,9 +9,10 @@ import ru.nesterov.bot.handlers.implementation.invocable.stateful.getSchedule.In
 import ru.nesterov.bot.statemachine.dto.Action;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -78,30 +77,26 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
 
     private List<PartialBotApiMethod<?>> handleSecondDateAndSendPdfReport(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
-
         getStateMachine(update).getMemory().setSecondDate(LocalDate.parse(buttonCallback.getValue()).plusDays(1));
+
+        GetPdfReportRequest memory = getStateMachine(update).getMemory();
+        long chatId = TelegramUpdateUtils.getChatId(update);
 
         InputStream inputStream = client.getClientPdfReport(
                 TelegramUpdateUtils.getUserId(update),
-                getStateMachine(update).getMemory().getClientName(),
-                getStateMachine(update).getMemory().getFirstDate().atStartOfDay(),
-                getStateMachine(update).getMemory().getSecondDate().atStartOfDay()
+                memory.getClientName(),
+                memory.getFirstDate().atStartOfDay(),
+                memory.getSecondDate().atStartOfDay()
         );
 
-        InputFile inputFile = new InputFile(
-                new ByteArrayInputStream(pdf),
-                "report_" + getStateMachine(update).getMemory().getClientName() + ".pdf"
+        String fileName = "report_%s_%s.pdf".formatted(
+                memory.getClientName(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy_HH-mm"))
         );
 
-        SendDocument sendDocument = new SendDocument();
-        sendDocument.setChatId(String.valueOf(TelegramUpdateUtils.getChatId(update)));
-        sendDocument.setDocument(inputFile);
-
-        buffer.set(sendDocument);
-
-        return getPlainSendMessage(
-                TelegramUpdateUtils.getChatId(update),
-                "PDF-отчёт отправлен"
+        return List.of(
+                buildSendDocument(chatId, inputStream, fileName),
+                getPlainSendMessage(chatId, "PDF-отчёт отправлен").getFirst()
         );
     }
 
