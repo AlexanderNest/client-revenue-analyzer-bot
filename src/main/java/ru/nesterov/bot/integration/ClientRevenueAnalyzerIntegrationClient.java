@@ -78,7 +78,7 @@ public class ClientRevenueAnalyzerIntegrationClient {
     }
 
     @SneakyThrows
-    public InputStream getClientPdfReport(long userId, String clientName, LocalDateTime startDate, LocalDateTime endDate){
+    public InputStream getClientPdfReportInputStream(long userId, String clientName, LocalDateTime startDate, LocalDateTime endDate){
         LinkedMultiValueMap<String,String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("clientName", clientName);
         requestParams.add("startDate", startDate.toString());

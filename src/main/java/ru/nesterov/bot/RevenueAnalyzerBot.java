@@ -73,7 +73,6 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
 
         sendMessages = enrichWithCommandButtons(sendMessages, update);
         sendMessage(sendMessages);
-
     }
 
     private List<PartialBotApiMethod<?>> enrichWithCommandButtons(List<PartialBotApiMethod<?>> sendMessages, Update update) {

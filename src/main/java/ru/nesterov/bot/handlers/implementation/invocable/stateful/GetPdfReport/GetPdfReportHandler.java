@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -32,9 +33,9 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         stateMachineProvider
                 .addTransition(State.STARTED, Action.COMMAND_INPUT, State.SELECT_CLIENT, this::handleCommandInputAndSendClients)
 
-                .addTransition(State.SELECT_CLIENT, Action.ANY_CALLBACK_INPUT, State.SELECT_FIRST_DATE, this::handleClientName)
+                .addTransition(State.SELECT_CLIENT, Action.ANY_CALLBACK_INPUT, State.SELECT_FIRST_DATE, this::handleClientNameAndSendFirstDateInput)
 
-                .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_DATE, State.SELECT_SECOND_DATE, this::handleFirstDate)
+                .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_DATE, State.SELECT_SECOND_DATE, this::handleFirstDateAndSendSecondDateInput)
                 .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_PREV, State.SELECT_FIRST_DATE, this::handleCallbackPrev)
                 .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_NEXT, State.SELECT_FIRST_DATE, this::handleCallbackNext)
                 .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_TODAY, State.SELECT_FIRST_DATE, this::handleCallbackToday)
@@ -57,7 +58,7 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         return handleMonthSwitch(update);
     }
 
-    private List<PartialBotApiMethod<?>> handleClientName(Update update) {
+    private List<PartialBotApiMethod<?>> handleClientNameAndSendFirstDateInput(Update update) {
         if (getStateMachine(update).getMemory().getClientName() == null) {
             ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
             getStateMachine(update).getMemory().setClientName(buttonCallback.getValue());
@@ -67,7 +68,7 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
     }
 
 
-    private List<PartialBotApiMethod<?>> handleFirstDate(Update update) {
+    private List<PartialBotApiMethod<?>> handleFirstDateAndSendSecondDateInput(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
 
         getStateMachine(update).getMemory().setFirstDate(LocalDate.parse(buttonCallback.getValue()));
@@ -82,7 +83,7 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         GetPdfReportRequest memory = getStateMachine(update).getMemory();
         long chatId = TelegramUpdateUtils.getChatId(update);
 
-        InputStream inputStream = client.getClientPdfReport(
+        InputStream inputStream = client.getClientPdfReportInputStream(
                 TelegramUpdateUtils.getUserId(update),
                 memory.getClientName(),
                 memory.getFirstDate().atStartOfDay(),
@@ -94,10 +95,11 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy_HH-mm"))
         );
 
-        return List.of(
-                buildSendDocument(chatId, inputStream, fileName),
-                getPlainSendMessage(chatId, "PDF-отчёт отправлен").getFirst()
-        );
+        List<PartialBotApiMethod<?>> messages = new ArrayList<>();
+        messages.addAll(buildSendDocument(chatId, inputStream, fileName));
+        messages.addAll(getPlainSendMessage(chatId, "PDF-отчёт отправлен"));
+
+        return messages;
     }
 
 

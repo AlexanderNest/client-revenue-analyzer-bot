@@ -83,6 +83,13 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
         return answerCallbackQuery;
     }
 
+    public List<PartialBotApiMethod<?>> buildSendDocument(long chatId, InputStream inputStream, String fileName) {
+        SendDocument sendDocument = new SendDocument();
+        sendDocument.setChatId(chatId);
+        sendDocument.setDocument(new InputFile(inputStream, fileName));
+        return List.of(sendDocument);
+    }
+
     private SendMessage buildSendMessage(long chatId, String text, ReplyKeyboard replyKeyboard) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(chatId));
@@ -108,12 +115,5 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
 
         button.setCallbackData(buttonCallbackService.getTelegramButtonCallbackString(buttonCallback));
         return button;
-    }
-
-    protected SendDocument buildSendDocument(long chatId, InputStream inputStream, String fileName) {
-        SendDocument sendDocument = new SendDocument();
-        sendDocument.setChatId(chatId);
-        sendDocument.setDocument(new InputFile(inputStream, fileName));
-        return sendDocument;
     }
 }
