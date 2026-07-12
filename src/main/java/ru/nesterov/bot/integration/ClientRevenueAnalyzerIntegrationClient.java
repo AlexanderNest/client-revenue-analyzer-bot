@@ -48,6 +48,7 @@ import ru.nesterov.bot.exception.UserFriendlyException;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.updateClient.UpdateClientRequest;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.updateClient.UpdateClientResponse;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.LocalDate;
@@ -77,17 +78,22 @@ public class ClientRevenueAnalyzerIntegrationClient {
         return get(String.valueOf(userId), requestParams, revenueAnalyzerProperties.getGetClientStatisticUrl(), GetClientStatisticResponse.class).getBody();
     }
 
-    @SneakyThrows
-    public InputStream getClientPdfReportInputStream(long userId, String clientName, LocalDateTime startDate, LocalDateTime endDate){
-        LinkedMultiValueMap<String,String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("clientName", clientName);
-        requestParams.add("startDate", startDate.toString());
-        requestParams.add("endDate", endDate.toString());
+    public InputStream getClientPdfReportInputStream(long userId, String clientName, LocalDateTime startDate, LocalDateTime endDate) {
+            LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+            requestParams.add("clientName", clientName);
+            requestParams.add("startDate", startDate.toString());
+            requestParams.add("endDate", endDate.toString());
 
-        Resource resource = get(String.valueOf(userId), requestParams,
-                revenueAnalyzerProperties.getGetClientPdfReportUrl(),
-                Resource.class).getBody();
-        return resource.getInputStream();
+            Resource resource = get(String.valueOf(userId), requestParams,
+                    revenueAnalyzerProperties.getGetClientPdfReportUrl(), Resource.class).getBody();
+            if (resource == null) {
+                throw new RuntimeException("Ошибка получения ресурса");
+            }
+            try {
+                return resource.getInputStream();
+            } catch (IOException e) {
+                throw new InternalException(e);
+            }
     }
 
     public GetYearBusynessStatisticsResponse getYearBusynessStatistics(long userId, int year) {
