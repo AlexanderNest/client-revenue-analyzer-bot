@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -49,7 +49,7 @@ public class SendMessageToUsersHandlerTest extends RegisteredUserHandlerTest {
         Update update1 = new Update();
         update1.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
+        List<PartialBotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
         SendMessage sendMessage = (SendMessage) (botApiMethod.get(0));
         Assertions.assertEquals("Введите текст рассылки", sendMessage.getText());
         Assertions.assertInstanceOf(SendMessage.class, sendMessage);
@@ -120,7 +120,7 @@ public class SendMessageToUsersHandlerTest extends RegisteredUserHandlerTest {
         Update update1 = new Update();
         update1.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
+        List<PartialBotApiMethod<?>> botApiMethod = sendMessageToUsersHandler.handle(update1);
         SendMessage sendMessage = (SendMessage) (botApiMethod.get(0));
         Assertions.assertEquals("Введите текст рассылки", sendMessage.getText());
         Assertions.assertInstanceOf(SendMessage.class, sendMessage);

@@ -3,7 +3,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.createClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.CreateClientRequest;
 import ru.nesterov.bot.dto.CreateClientResponse;
@@ -43,36 +43,36 @@ public class CreateClientHandler extends StatefulCommandHandler<State, CreateCli
                 .addTransition(State.CLIENT_NAME_GENERATION_INPUT, Action.CALLBACK_FALSE, State.FINISH, this::createClient);
     }
 
-    private List<BotApiMethod<?>> handleCreateClientCommand(Update update) {
+    private List<PartialBotApiMethod<?>> handleCreateClientCommand(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите имя");
     }
 
-    private List<BotApiMethod<?>> handleNameInput(Update update) {
+    private List<PartialBotApiMethod<?>> handleNameInput(Update update) {
         getStateMachine(update).getMemory().setName(update.getMessage().getText());
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите стоимость за час");
     }
 
-    private List<BotApiMethod<?>> handlePricePerHourInput(Update update) {
+    private List<PartialBotApiMethod<?>> handlePricePerHourInput(Update update) {
         getStateMachine(update).getMemory().setPricePerHour(Integer.parseInt(update.getMessage().getText()));
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите описание");
     }
 
-    private List<BotApiMethod<?>> handleDescriptionInput(Update update) {
+    private List<PartialBotApiMethod<?>> handleDescriptionInput(Update update) {
         getStateMachine(update).getMemory().setDescription(update.getMessage().getText());
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите номер телефона");
     }
 
-    private List<BotApiMethod<?>> handlePhoneNumberInput(Update update) {
+    private List<PartialBotApiMethod<?>> handlePhoneNumberInput(Update update) {
         getStateMachine(update).getMemory().setPhone(update.getMessage().getText());
         return getApproveKeyBoardMessage(update, "Включить генерацию нового имени, если клиент с таким именем уже существует?");
     }
 
-    private List<BotApiMethod<?>> handleIdGenerationNeededInput(Update update) {
+    private List<PartialBotApiMethod<?>> handleIdGenerationNeededInput(Update update) {
         getStateMachine(update).getMemory().setIdGenerationNeeded(Boolean.valueOf(getButtonCallbackValue(update)));
         return createClient(update);
     }
 
-    private List<BotApiMethod<?>> createClient(Update update) {
+    private List<PartialBotApiMethod<?>> createClient(Update update) {
         long chatId = TelegramUpdateUtils.getChatId(update);
         CreateClientResponse response = client.createClient(
                 String.valueOf(TelegramUpdateUtils.getChatId(update)),

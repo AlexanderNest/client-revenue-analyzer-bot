@@ -23,4 +23,5 @@ public class RevenueAnalyzerProperties {
     private String clientUrl;
     private String clientUpdateUrl;
     private String getUsersIdByRoleAndSourceUrl;
+    private String getClientPdfReportUrl;
 }

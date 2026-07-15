@@ -5,10 +5,12 @@ import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
@@ -17,6 +19,7 @@ import ru.nesterov.bot.handlers.callback.ButtonCallback;
 import ru.nesterov.bot.handlers.service.ButtonCallbackService;
 import ru.nesterov.bot.integration.ClientRevenueAnalyzerIntegrationClient;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,7 +42,7 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
      *
      * @param messages - сообщение для отправки
      */
-    public List<BotApiMethod<?>> getPlainSendMessage(long chatId, String... messages) {
+    public List<PartialBotApiMethod<?>> getPlainSendMessage(long chatId, String... messages) {
         return Arrays.stream(messages)
                 .map(message -> buildSendMessage(chatId, message, null))
                 .collect(Collectors.toList());
@@ -48,7 +51,7 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
     /**
      * Метод для отправки текстового сообщения с клавиатурой в чат
      */
-    public List<BotApiMethod<?>> getReplyKeyboard(long chatId, String text, ReplyKeyboard replyKeyboard) {
+    public List<PartialBotApiMethod<?>> getReplyKeyboard(long chatId, String text, ReplyKeyboard replyKeyboard) {
         return List.of(buildSendMessage(chatId, text, replyKeyboard));
     }
 
@@ -57,7 +60,7 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
      *
      * @param keyboardMarkup - если в сообщении нужно добавить клавиатуру
      */
-    public List<BotApiMethod<?>> editMessage(long chatId, int messageId, String text, @Nullable InlineKeyboardMarkup keyboardMarkup) {
+    public List<PartialBotApiMethod<?>> editMessage(long chatId, int messageId, String text, @Nullable InlineKeyboardMarkup keyboardMarkup) {
         EditMessageText editMessageText = new EditMessageText();
         editMessageText.setChatId(chatId);
         editMessageText.setMessageId(messageId);
@@ -70,7 +73,7 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
     /**
      * Метод для отправки всплывающего сообщения. Оно появится на некоторое время поверх чата, потом исчезнет
      */
-    public BotApiMethod<?> getCallbackQuery(Update update, String message) {
+    public PartialBotApiMethod<?> getCallbackQuery(Update update, String message) {
         CallbackQuery callbackQuery = update.getCallbackQuery();
 
         AnswerCallbackQuery answerCallbackQuery = new AnswerCallbackQuery();
@@ -78,6 +81,13 @@ public abstract class SendingMessageCommandHandler implements CommandHandler {
         answerCallbackQuery.setText(message);
 
         return answerCallbackQuery;
+    }
+
+    public List<PartialBotApiMethod<?>> buildSendDocument(long chatId, InputStream inputStream, String fileName) {
+        SendDocument sendDocument = new SendDocument();
+        sendDocument.setChatId(chatId);
+        sendDocument.setDocument(new InputFile(inputStream, fileName));
+        return List.of(sendDocument);
     }
 
     private SendMessage buildSendMessage(long chatId, String text, ReplyKeyboard replyKeyboard) {

@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.AiAnalyzerResponse;
@@ -33,7 +33,7 @@ class AiAnalyzerHandlerTest extends RegisteredUserHandlerTest {
         aiAnalyzerResponse.setContent("Клиент 1 показал отличные результаты в плане продуктивности и дохода.");
         when(client.getAiStatistics(anyLong())).thenReturn(aiAnalyzerResponse);
 
-        List<BotApiMethod<?>> command = commandHandler.handle(update);
+        List<PartialBotApiMethod<?>> command = commandHandler.handle(update);
         assertFalse(command.isEmpty());
         assertEquals(1, command.size());
         assertInstanceOf(SendMessage.class, command.get(0));

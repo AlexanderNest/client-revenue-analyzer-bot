@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -46,6 +48,8 @@ import ru.nesterov.bot.exception.UserFriendlyException;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.updateClient.UpdateClientRequest;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.updateClient.UpdateClientResponse;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -72,6 +76,24 @@ public class ClientRevenueAnalyzerIntegrationClient {
         requestParams.add("clientName", clientName);
 
         return get(String.valueOf(userId), requestParams, revenueAnalyzerProperties.getGetClientStatisticUrl(), GetClientStatisticResponse.class).getBody();
+    }
+
+    public InputStream getClientPdfReportInputStream(long userId, String clientName, LocalDateTime startDate, LocalDateTime endDate) {
+            LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+            requestParams.add("clientName", clientName);
+            requestParams.add("startDate", startDate.toString());
+            requestParams.add("endDate", endDate.toString());
+
+            Resource resource = get(String.valueOf(userId), requestParams,
+                    revenueAnalyzerProperties.getGetClientPdfReportUrl(), Resource.class).getBody();
+            if (resource == null) {
+                throw new RuntimeException("Ошибка получения ресурса");
+            }
+            try {
+                return resource.getInputStream();
+            } catch (IOException e) {
+                throw new InternalException(e);
+            }
     }
 
     public GetYearBusynessStatisticsResponse getYearBusynessStatistics(long userId, int year) {

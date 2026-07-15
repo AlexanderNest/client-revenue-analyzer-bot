@@ -1,0 +1,136 @@
+package ru.nesterov.bot.handlers.implementation.invocable.stateful.GetPdfReport;
+
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
+import ru.nesterov.bot.handlers.callback.ButtonCallback;
+import ru.nesterov.bot.handlers.implementation.invocable.stateful.getSchedule.InlineCalendarBuilder;
+import ru.nesterov.bot.statemachine.dto.Action;
+import ru.nesterov.bot.utils.TelegramUpdateUtils;
+
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+@Component
+public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfReportRequest> {
+
+    private static final String ENTER_FIRST_DATE = "Введите первую дату";
+    private static final String ENTER_SECOND_DATE = "Введите вторую дату";
+    private final InlineCalendarBuilder inlineCalendarBuilder;
+
+    public GetPdfReportHandler(InlineCalendarBuilder inlineCalendarBuilder) {
+        super(State.STARTED, GetPdfReportRequest.class);
+        this.inlineCalendarBuilder = inlineCalendarBuilder;
+    }
+
+    @Override
+    protected void initTransitions() {
+        stateMachineProvider
+                .addTransition(State.STARTED, Action.COMMAND_INPUT, State.SELECT_CLIENT, this::handleCommandInputAndSendClients)
+
+                .addTransition(State.SELECT_CLIENT, Action.ANY_CALLBACK_INPUT, State.SELECT_FIRST_DATE, this::handleClientNameAndSendFirstDateInput)
+
+                .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_DATE, State.SELECT_SECOND_DATE, this::handleFirstDateAndSendSecondDateInput)
+                .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_PREV, State.SELECT_FIRST_DATE, this::switchMonthToPrevious)
+                .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_NEXT, State.SELECT_FIRST_DATE, this::switchToNextMonth)
+                .addTransition(State.SELECT_FIRST_DATE, Action.CALLBACK_TODAY, State.SELECT_FIRST_DATE, this::switchToCurrentMonth)
+
+                .addTransition(State.SELECT_SECOND_DATE, Action.CALLBACK_DATE, State.FINISH, this::handleSecondDateAndSendPdfReport)
+                .addTransition(State.SELECT_SECOND_DATE, Action.CALLBACK_PREV, State.SELECT_SECOND_DATE, this::switchMonthToPrevious)
+                .addTransition(State.SELECT_SECOND_DATE, Action.CALLBACK_NEXT, State.SELECT_SECOND_DATE, this::switchToNextMonth)
+                .addTransition(State.SELECT_SECOND_DATE, Action.CALLBACK_TODAY, State.SELECT_SECOND_DATE, this::switchToCurrentMonth);
+    }
+
+    @Override
+    public String getCommand() {
+        return "Сформировать PDF-отчет";
+    }
+
+    private List<PartialBotApiMethod<?>> switchMonthToPrevious(Update update) {
+        LocalDate displayedMonth = getStateMachine(update).getMemory().getDisplayedMonth().minusMonths(1);
+        getStateMachine(update).getMemory().setDisplayedMonth(displayedMonth);
+        return handleMonthSwitch(update);
+    }
+
+    private List<PartialBotApiMethod<?>> handleClientNameAndSendFirstDateInput(Update update) {
+        if (getStateMachine(update).getMemory().getClientName() == null) {
+            ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
+            getStateMachine(update).getMemory().setClientName(buttonCallback.getValue());
+        }
+        getStateMachine(update).getMemory().setDisplayedMonth(LocalDate.now().withDayOfMonth(1));
+        return sendCalendarKeyBoard(update, ENTER_FIRST_DATE, getStateMachine(update).getMemory().getDisplayedMonth());
+    }
+
+    private List<PartialBotApiMethod<?>> handleFirstDateAndSendSecondDateInput(Update update) {
+        ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
+
+        getStateMachine(update).getMemory().setFirstDate(LocalDate.parse(buttonCallback.getValue()));
+        return sendCalendarKeyBoard(update, ENTER_SECOND_DATE, getStateMachine(update).getMemory().getFirstDate());
+    }
+
+    private List<PartialBotApiMethod<?>> handleSecondDateAndSendPdfReport(Update update) {
+        ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
+        getStateMachine(update).getMemory().setSecondDate(LocalDate.parse(buttonCallback.getValue()).plusDays(1));
+
+        GetPdfReportRequest memory = getStateMachine(update).getMemory();
+        long chatId = TelegramUpdateUtils.getChatId(update);
+
+        InputStream inputStream = client.getClientPdfReportInputStream(
+                TelegramUpdateUtils.getUserId(update),
+                memory.getClientName(),
+                memory.getFirstDate().atStartOfDay(),
+                memory.getSecondDate().atStartOfDay()
+        );
+
+        String fileName = "report_%s_%s.pdf".formatted(
+                memory.getClientName(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss"))
+        );
+
+        List<PartialBotApiMethod<?>> messages = new ArrayList<>();
+        messages.addAll(buildSendDocument(chatId, inputStream, fileName));
+        messages.addAll(getPlainSendMessage(chatId, "PDF-отчёт отправлен"));
+
+        return messages;
+    }
+
+    private List<PartialBotApiMethod<?>> sendCalendarKeyBoard(Update update, String text, LocalDate date) {
+        return editMessage(TelegramUpdateUtils.getChatId(update),
+                TelegramUpdateUtils.getMessageId(update),
+                text,
+                inlineCalendarBuilder.createCalendarMarkup(date, getCommand(), buttonCallbackService)
+        );
+    }
+
+    private List<PartialBotApiMethod<?>> handleCommandInputAndSendClients(Update update) {
+        return getClientNamesKeyboard(update, "Выберите клиента, для которого хотите получить PDF-отчет:");
+    }
+
+    private List<PartialBotApiMethod<?>> switchToCurrentMonth(Update update) {
+        LocalDate today = LocalDate.now();
+        getStateMachine(update).getMemory().setDisplayedMonth(today.withDayOfMonth(1));
+        return handleMonthSwitch(update);
+    }
+
+    private List<PartialBotApiMethod<?>> switchToNextMonth(Update update) {
+        LocalDate displayedMonth = getStateMachine(update).getMemory().getDisplayedMonth().plusMonths(1);
+        getStateMachine(update).getMemory().setDisplayedMonth(displayedMonth);
+        return handleMonthSwitch(update);
+    }
+
+    private List<PartialBotApiMethod<?>> handleMonthSwitch(Update update) {
+        String calendarMessage = "";
+        if (getStateMachine(update).getMemory().getFirstDate() == null) {
+            calendarMessage = ENTER_FIRST_DATE;
+        } else if (getStateMachine(update).getMemory().getSecondDate() == null) {
+            calendarMessage = ENTER_SECOND_DATE;
+        }
+        LocalDate firstDayOfMonth = getStateMachine(update).getMemory().getDisplayedMonth().withDayOfMonth(1);
+        return sendCalendarKeyBoard(update, calendarMessage, firstDayOfMonth);
+    }
+}

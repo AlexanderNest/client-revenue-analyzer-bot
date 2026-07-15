@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -71,7 +71,7 @@ public class UpdateUserControlButtonsHandlerTest extends RegisteredUserHandlerTe
         getUserRequest.setUsername(user.getUserName());
 
 
-        List<BotApiMethod<?>> result = updateUserControlButtonsHandler.handle(update);
+        List<PartialBotApiMethod<?>> result = updateUserControlButtonsHandler.handle(update);
 
         assertNotNull(result);
         assertEquals(SendMessage.class, result.get(0).getClass());
@@ -115,7 +115,7 @@ public class UpdateUserControlButtonsHandlerTest extends RegisteredUserHandlerTe
 
         when(client.getUserByUsername(any())).thenReturn(null);
 
-        List<BotApiMethod<?>> result = updateUserControlButtonsHandler.handle(update);
+        List<PartialBotApiMethod<?>> result = updateUserControlButtonsHandler.handle(update);
 
         assertNotNull(result);
         assertEquals(SendMessage.class, result.get(0).getClass());

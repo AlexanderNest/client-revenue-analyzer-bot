@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -89,7 +89,7 @@ class MakeEventsBackupHandlerTest extends RegisteredUserHandlerTest {
         Update firstUpdate = new Update();
         firstUpdate.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
@@ -169,7 +169,7 @@ class MakeEventsBackupHandlerTest extends RegisteredUserHandlerTest {
         Update firstUpdate = new Update();
         firstUpdate.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
@@ -250,7 +250,7 @@ class MakeEventsBackupHandlerTest extends RegisteredUserHandlerTest {
         Update firstUpdate = new Update();
         firstUpdate.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(firstUpdate);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);

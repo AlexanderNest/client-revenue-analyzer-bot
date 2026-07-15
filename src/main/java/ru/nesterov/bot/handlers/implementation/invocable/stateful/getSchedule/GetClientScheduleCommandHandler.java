@@ -3,7 +3,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.getSchedule;
 
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.ClientAllScheduleResponse;
 import ru.nesterov.bot.dto.GetClientScheduleRequest;
@@ -53,7 +53,7 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
                 .addTransition(State.SELECT_SECOND_DATE, Action.CALLBACK_TODAY, State.SELECT_SECOND_DATE, this::handleCallbackToday);
     }
 
-    private List<BotApiMethod<?>> handleClientName(Update update) {
+    private List<PartialBotApiMethod<?>> handleClientName(Update update) {
         if (getStateMachine(update).getMemory().getClientName() == null) {
             ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
             getStateMachine(update).getMemory().setClientName(buttonCallback.getValue());
@@ -63,7 +63,7 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleFirstDate(Update update) {
+    private List<PartialBotApiMethod<?>> handleFirstDate(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
 
         getStateMachine(update).getMemory().setFirstDate(LocalDate.parse(buttonCallback.getValue()));
@@ -71,7 +71,7 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleSecondDate(Update update) {
+    private List<PartialBotApiMethod<?>> handleSecondDate(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
 
         getStateMachine(update).getMemory().setSecondDate(LocalDate.parse(buttonCallback.getValue()).plusDays(1));
@@ -79,7 +79,7 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> sendCalendarKeyBoard(Update update, String text, LocalDate date) {
+    private List<PartialBotApiMethod<?>> sendCalendarKeyBoard(Update update, String text, LocalDate date) {
         return editMessage(TelegramUpdateUtils.getChatId(update),
                 TelegramUpdateUtils.getMessageId(update),
                 text,
@@ -88,12 +88,12 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleCommandInputAndSendClients(Update update) {
+    private List<PartialBotApiMethod<?>> handleCommandInputAndSendClients(Update update) {
         return getClientNamesKeyboard(update, "Выберите клиента, для которого хотите получить расписание:");
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> sendClientSchedule(Update update) {
+    private List<PartialBotApiMethod<?>> sendClientSchedule(Update update) {
         ClientAllScheduleResponse response = client.getClientSchedule(
                 TelegramUpdateUtils.getUserId(update),
                 getStateMachine(update).getMemory().getClientName(),
@@ -152,27 +152,27 @@ public class GetClientScheduleCommandHandler extends StatefulCommandHandler<Stat
 //    }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleCallbackPrev(Update update) {
+    private List<PartialBotApiMethod<?>> handleCallbackPrev(Update update) {
         LocalDate displayedMonth = getStateMachine(update).getMemory().getDisplayedMonth().minusMonths(1);
         getStateMachine(update).getMemory().setDisplayedMonth(displayedMonth);
         return handleMonthSwitch(update);
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleCallbackToday(Update update) {
+    private List<PartialBotApiMethod<?>> handleCallbackToday(Update update) {
         LocalDate today = LocalDate.now();
         getStateMachine(update).getMemory().setDisplayedMonth(today.withDayOfMonth(1));
         return handleMonthSwitch(update);
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleCallbackNext(Update update) {
+    private List<PartialBotApiMethod<?>> handleCallbackNext(Update update) {
         LocalDate displayedMonth = getStateMachine(update).getMemory().getDisplayedMonth().plusMonths(1);
         getStateMachine(update).getMemory().setDisplayedMonth(displayedMonth);
         return handleMonthSwitch(update);
     }
 
-    private List<BotApiMethod<?>> handleMonthSwitch(Update update) {
+    private List<PartialBotApiMethod<?>> handleMonthSwitch(Update update) {
         String calendarMessage = "";
         if (getStateMachine(update).getMemory().getFirstDate() == null) {
             calendarMessage = ENTER_FIRST_DATE;

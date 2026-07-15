@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -82,7 +82,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());
@@ -181,7 +181,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());
@@ -275,7 +275,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());
@@ -374,7 +374,7 @@ public class CreateClientTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createClientHandler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
         assertEquals("Введите имя", sendMessage.getText());

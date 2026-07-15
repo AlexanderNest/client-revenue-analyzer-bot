@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -72,7 +72,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
 
         Update updateNext = createUpdateWithCallbackQuery(nextCallback.getValue());
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(updateNext);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(updateNext);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
 
         EditMessageText text = (EditMessageText) botApiMethod.get(0);
@@ -87,7 +87,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
 
         Update updateToday = createUpdateWithCallbackQuery(todayCallback.getValue());
 
-        List<BotApiMethod<?>> botApiMethodToday = handler.handle(updateToday);
+        List<PartialBotApiMethod<?>> botApiMethodToday = handler.handle(updateToday);
         assertInstanceOf(EditMessageText.class, botApiMethodToday.get(0));
 
         EditMessageText text1 = (EditMessageText) botApiMethodToday.get(0);
@@ -104,7 +104,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
 
         Update update = createUpdateWithCommand();
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
@@ -131,7 +131,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
         handler.handle(updateWithCommand);
         Update updateWithClientName = createUpdateWithCallbackQuery("Клиент 1");
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(updateWithClientName);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(updateWithClientName);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
 
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
@@ -156,7 +156,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
         LocalDate firstDate = LocalDate.now();
         Update updateWithFirstDate = createUpdateWithCallbackQuery(String.valueOf(firstDate));
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(updateWithFirstDate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(updateWithFirstDate);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
 
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
@@ -215,7 +215,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
         )).thenReturn(mockResponse);
 
         Update updateWithSecondDate = createUpdateWithCallbackQuery(String.valueOf(secondDate));
-        List<BotApiMethod<?>> botApiMethod = handler.handle(updateWithSecondDate);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(updateWithSecondDate);
 
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
@@ -257,7 +257,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
 
         Update update = createUpdateWithCallbackQuery("Prev");
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
 
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
@@ -281,7 +281,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
 
         Update update = createUpdateWithCallbackQuery("Next");
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
 
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
@@ -325,7 +325,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
     void handleCommandWhenNoClientsFound() {
         Update update = createUpdateWithCommand();
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
 
@@ -355,7 +355,7 @@ public class GetClientScheduleCommandHandlerTest extends RegisteredUserHandlerTe
         when(client.getActiveClients(anyLong())).thenReturn(unsortedClients);
 
         Update update = createUpdateWithCommand();
-        List<BotApiMethod<?>> result = handler.handle(update);
+        List<PartialBotApiMethod<?>> result = handler.handle(update);
 
         assertInstanceOf(SendMessage.class, result.get(0));
         SendMessage sendMessage = (SendMessage) result.get(0);

@@ -3,7 +3,7 @@ package ru.nesterov.bot.handlers.statemachine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import ru.nesterov.bot.statemachine.StateMachine;
 import ru.nesterov.bot.statemachine.StateMachineProvider;
@@ -39,7 +39,7 @@ public class StateMachineProviderTest {
         Assertions.assertNotNull(nextStateFunction);
         Assertions.assertEquals(StateTest.WAITING_INPUT, nextStateFunction.getState());
 
-        List<BotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
+        List<PartialBotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
         Assertions.assertInstanceOf(SendMessage.class, response.get(0));
         Assertions.assertEquals("Текст", ((SendMessage) response.get(0)).getText());
     }

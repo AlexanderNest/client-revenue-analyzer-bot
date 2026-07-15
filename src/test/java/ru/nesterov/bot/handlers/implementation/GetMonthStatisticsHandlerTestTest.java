@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -73,7 +73,7 @@ class GetMonthStatisticsHandlerTestTest extends RegisteredUserHandlerTest {
 
         update.setCallbackQuery(callbackQuery);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(EditMessageText.class, botApiMethod.get(0));
         EditMessageText editMessage = (EditMessageText) botApiMethod.get(0);
 
@@ -102,7 +102,7 @@ class GetMonthStatisticsHandlerTestTest extends RegisteredUserHandlerTest {
         Update update = new Update();
         update.setMessage(message);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
 
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 

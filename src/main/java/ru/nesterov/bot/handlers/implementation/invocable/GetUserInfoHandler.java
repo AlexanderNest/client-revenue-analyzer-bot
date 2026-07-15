@@ -1,7 +1,7 @@
 package ru.nesterov.bot.handlers.implementation.invocable;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.GetUserRequest;
 import ru.nesterov.bot.dto.GetUserResponse;
@@ -19,7 +19,7 @@ public class GetUserInfoHandler extends InvocableCommandHandler {
     }
 
     @Override
-    public List<BotApiMethod<?>> handle(Update update) {
+    public List<PartialBotApiMethod<?>> handle(Update update) {
         long telegramUserId = TelegramUpdateUtils.getUserId(update);
 
         GetUserRequest request = new GetUserRequest();

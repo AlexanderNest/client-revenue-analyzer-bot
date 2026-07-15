@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.getClientStat
 
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.dto.GetClientStatisticResponse;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
@@ -36,7 +36,7 @@ public class GetClientStatisticHandler extends StatefulCommandHandler<State, NoM
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleClientNameAndSendReport(Update update) {
+    private List<PartialBotApiMethod<?>> handleClientNameAndSendReport(Update update) {
         long userId = update.getCallbackQuery().getFrom().getId();
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
         GetClientStatisticResponse response = client.getClientStatistic(userId, buttonCallback.getValue());
@@ -57,7 +57,7 @@ public class GetClientStatisticHandler extends StatefulCommandHandler<State, NoM
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> handleCommandInputAndSendClientNamesKeyboard(Update update) {
+    private List<PartialBotApiMethod<?>> handleCommandInputAndSendClientNamesKeyboard(Update update) {
         return getClientNamesKeyboard(update, "Выберите клиента, чью статистику хотите узнать:");
     }
 

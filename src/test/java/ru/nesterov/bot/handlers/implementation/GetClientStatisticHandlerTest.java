@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
@@ -51,7 +51,7 @@ public class GetClientStatisticHandlerTest extends RegisteredUserHandlerTest {
     void handleCommandWhenNoClientsFound() {
         Update update = createUpdateWithCommand();
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
 
@@ -65,7 +65,7 @@ public class GetClientStatisticHandlerTest extends RegisteredUserHandlerTest {
         List<GetActiveClientResponse> clients = createActiveClients();
         when(client.getActiveClients(anyLong())).thenReturn(clients);
 
-        List<BotApiMethod<?>> botApiMethod = handler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = handler.handle(update);
         SendMessage sendMessage = (SendMessage) botApiMethod.get(0);
 
         assertEquals("Выберите клиента, чью статистику хотите узнать:", sendMessage.getText());
@@ -103,7 +103,7 @@ public class GetClientStatisticHandlerTest extends RegisteredUserHandlerTest {
         clientCallback.setCommand("Выберите клиента, чью статистику хотите узнать:");
         clientCallback.setValue("Клиент 1");
         Update updateWithClientName = createUpdateWithCallbackQuery(clientCallback.getValue());
-        List<BotApiMethod<?>> botApiMethod2 = handler.handle(updateWithClientName);
+        List<PartialBotApiMethod<?>> botApiMethod2 = handler.handle(updateWithClientName);
 
         assertInstanceOf(EditMessageText.class, botApiMethod2.get(0));
 

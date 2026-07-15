@@ -1,7 +1,7 @@
 package ru.nesterov.bot.statemachine;
 
 import lombok.Getter;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.statemachine.dto.Action;
 import ru.nesterov.bot.statemachine.dto.NextStateFunction;
@@ -24,7 +24,7 @@ public class StateMachine<STATE extends Enum<STATE>, ACTION, MEMORY> {
         this.memory = memory;
     }
 
-    public StateMachine<STATE, ACTION, MEMORY> addTransition(STATE state, Action actionForTransition, STATE nextState, Function<Update, List<BotApiMethod<?>>> functionForTransition) {
+    public StateMachine<STATE, ACTION, MEMORY> addTransition(STATE state, Action actionForTransition, STATE nextState, Function<Update, List<PartialBotApiMethod<?>>> functionForTransition) {
         transitions.put(new TransitionDescription<>(state, actionForTransition), new NextStateFunction<>(nextState, functionForTransition));
         return this;
     }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -43,7 +43,7 @@ public class DeleteClientHandlerTest extends RegisteredUserHandlerTest {
     @Test
     void shouldReturnNoClientsMessage() {
         Update update = createUpdateWithMessage(handler.getCommand());
-        List<BotApiMethod<?>> handle = handler.handle(update);
+        List<PartialBotApiMethod<?>> handle = handler.handle(update);
         assertEquals(1, handle.size());
         SendMessage sendMessage = (SendMessage) handle.get(0);
         assertEquals("Нет доступных клиентов", sendMessage.getText());
@@ -55,7 +55,7 @@ public class DeleteClientHandlerTest extends RegisteredUserHandlerTest {
         when(client.getActiveClients(anyLong())).thenReturn(clients);
 
         Update update = createUpdateWithMessage(handler.getCommand());
-        List<BotApiMethod<?>> handle = handler.handle(update);
+        List<PartialBotApiMethod<?>> handle = handler.handle(update);
         assertEquals(1, handle.size());
         SendMessage sendMessage = (SendMessage) handle.get(0);
         assertEquals("Выберите клиента для удаления:", sendMessage.getText());
@@ -71,7 +71,7 @@ public class DeleteClientHandlerTest extends RegisteredUserHandlerTest {
         selectCallback.setValue("Макс");
 
         Update selectUpdate = createUpdateWithCallbackQuery("Макс");
-        List<BotApiMethod<?>> step2Result = handler.handle(selectUpdate);
+        List<PartialBotApiMethod<?>> step2Result = handler.handle(selectUpdate);
 
         assertEquals(1, step2Result.size());
         SendMessage confirmationMessage = (SendMessage) step2Result.get(0);
@@ -90,7 +90,7 @@ public class DeleteClientHandlerTest extends RegisteredUserHandlerTest {
         confirmCallback.setValue("Да");
 
         Update confirmUpdate = createUpdateWithCallbackQuery("Да");
-        List<BotApiMethod<?>> step3Result = handler.handle(confirmUpdate);
+        List<PartialBotApiMethod<?>> step3Result = handler.handle(confirmUpdate);
 
         assertEquals(1, step3Result.size());
         SendMessage successMessage = (SendMessage) step3Result.get(0);

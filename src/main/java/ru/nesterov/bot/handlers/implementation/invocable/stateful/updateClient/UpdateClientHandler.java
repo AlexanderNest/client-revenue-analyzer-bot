@@ -1,7 +1,7 @@
 package ru.nesterov.bot.handlers.implementation.invocable.stateful.updateClient;
 
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
@@ -46,65 +46,65 @@ public class UpdateClientHandler extends StatefulCommandHandler<State, UpdateCli
                 .addTransition(State.CHANGE_PHONE, Action.ANY_STRING, State.FINISH, this::handleInputPhoneAndUpdateClient);
     }
 
-    public List<BotApiMethod<?>> handleCommandInputAndSendClientNamesKeyboard(Update update) {
+    public List<PartialBotApiMethod<?>> handleCommandInputAndSendClientNamesKeyboard(Update update) {
         return getClientNamesKeyboard(update, "Выберите клиента для обновления данных:");
     }
 
-    private List<BotApiMethod<?>> handleClientNameAndSendNameChangeApprove(Update update) {
+    private List<PartialBotApiMethod<?>> handleClientNameAndSendNameChangeApprove(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
         getStateMachine(update).getMemory().setClientName(buttonCallback.getValue());
         return getApproveKeyBoardMessage(update, "Обновить имя клиента?");
     }
 
-    private List<BotApiMethod<?>> handleChangeNameTrueAndAskForNewName(Update update) {
+    private List<PartialBotApiMethod<?>> handleChangeNameTrueAndAskForNewName(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите новое имя:");
     }
 
-    private List<BotApiMethod<?>> handleNewClientNameInputAndSendPriceChangeApprove(Update update) {
+    private List<PartialBotApiMethod<?>> handleNewClientNameInputAndSendPriceChangeApprove(Update update) {
         getStateMachine(update).getMemory().setNewName(update.getMessage().getText());
         return getApproveKeyBoardMessage(update, "Обновить стоимость за час клиента?");
     }
 
-    private List<BotApiMethod<?>> handleChangeNameFalseAndSendPriceChangeApprove(Update update) {
+    private List<PartialBotApiMethod<?>> handleChangeNameFalseAndSendPriceChangeApprove(Update update) {
         return editCurrentApproveKeyboardMessage(update, "Обновить стоимость за час клиента?");
     }
 
-    private List<BotApiMethod<?>> handleTruePriceChangingAndAskForNewPrice(Update update) {
+    private List<PartialBotApiMethod<?>> handleTruePriceChangingAndAskForNewPrice(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите новую стоимость клиента за час: ");
     }
 
-    private List<BotApiMethod<?>> handleNewPriceInputAndSendDescriptionChangeApprove(Update update) {
+    private List<PartialBotApiMethod<?>> handleNewPriceInputAndSendDescriptionChangeApprove(Update update) {
         getStateMachine(update).getMemory().setPricePerHour(Integer.parseInt(update.getMessage().getText()));
         return getApproveKeyBoardMessage(update, "Обновить описание клиента?");
     }
 
-    private List<BotApiMethod<?>> handleFalsePriceChangingAndAskForChangeDescription(Update update) {
+    private List<PartialBotApiMethod<?>> handleFalsePriceChangingAndAskForChangeDescription(Update update) {
         return editCurrentApproveKeyboardMessage(update, "Обновить описание клиента?");
     }
 
-    private List<BotApiMethod<?>> handleFalseDescriptionChangingAndSendUpdatePhoneApprove(Update update) {
+    private List<PartialBotApiMethod<?>> handleFalseDescriptionChangingAndSendUpdatePhoneApprove(Update update) {
         return editCurrentApproveKeyboardMessage(update, "Обновить номер телефона клиента?");
     }
 
-    private List<BotApiMethod<?>> handleTrueDescriptionChangingAndAskForChangeDescription(Update update) {
+    private List<PartialBotApiMethod<?>> handleTrueDescriptionChangingAndAskForChangeDescription(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите новое описание клиента: ");
     }
 
-    private List<BotApiMethod<?>> handleDescriptionInputAndAskForChangePhone(Update update) {
+    private List<PartialBotApiMethod<?>> handleDescriptionInputAndAskForChangePhone(Update update) {
         getStateMachine(update).getMemory().setDescription(update.getMessage().getText());
         return getApproveKeyBoardMessage(update, "Обновить номер телефона клиента?");
     }
 
-    private List<BotApiMethod<?>> handleFalsePhoneChangingAndAndUpdateClient(Update update) {
+    private List<PartialBotApiMethod<?>> handleFalsePhoneChangingAndAndUpdateClient(Update update) {
         UpdateClientResponse updateClientResponse = client.updateClient(TelegramUpdateUtils.getChatId(update), getStateMachine(update).getMemory());
         return editMessage(TelegramUpdateUtils.getChatId(update), TelegramUpdateUtils.getMessageId(update), formatUpdateClients(updateClientResponse), null);
     }
 
-    private List<BotApiMethod<?>> handleTruePhoneChangingAndAskForNewPhone(Update update) {
+    private List<PartialBotApiMethod<?>> handleTruePhoneChangingAndAskForNewPhone(Update update) {
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Введите новый номер телефона: ");
     }
 
-    private List<BotApiMethod<?>> handleInputPhoneAndUpdateClient(Update update) {
+    private List<PartialBotApiMethod<?>> handleInputPhoneAndUpdateClient(Update update) {
         getStateMachine(update).getMemory().setPhone(update.getMessage().getText());
         UpdateClientResponse updateClientResponse = client.updateClient(TelegramUpdateUtils.getChatId(update), getStateMachine(update).getMemory());
         return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), formatUpdateClients(updateClientResponse));

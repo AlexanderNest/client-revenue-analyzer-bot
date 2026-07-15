@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.nesterov.bot.handlers.abstractions.GroupingCommandHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.AiAnalyzerHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.GetActiveClientsHandler;
+import ru.nesterov.bot.handlers.implementation.invocable.stateful.GetPdfReport.GetPdfReportHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.getClientStatisticHandler.GetClientStatisticHandler;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.getSchedule.GetClientScheduleCommandHandler;
 
@@ -14,12 +15,14 @@ public class ClientInfoOperationGroupHandler extends GroupingCommandHandler {
     protected ClientInfoOperationGroupHandler(AiAnalyzerHandler aiAnalyzerHandler,
                                               GetActiveClientsHandler getActiveClientsHandler,
                                               GetClientStatisticHandler getClientStatisticHandler,
-                                              GetClientScheduleCommandHandler getClientScheduleCommandHandler) {
+                                              GetClientScheduleCommandHandler getClientScheduleCommandHandler,
+                                              GetPdfReportHandler getPdfReportHandler) {
         super(List.of(
                         aiAnalyzerHandler,
                         getActiveClientsHandler,
                         getClientStatisticHandler,
-                        getClientScheduleCommandHandler
+                        getClientScheduleCommandHandler,
+                        getPdfReportHandler
                 )
         );
     }

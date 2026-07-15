@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -81,7 +81,7 @@ public class CreateUserHandlerTestTest extends RegisteredUserHandlerTest {
         update.setMessage(message);
 
         when(client.getUserByUsername(any(GetUserRequest.class))).thenReturn(null);
-        List<BotApiMethod<?>> botApiMethod = createUserHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createUserHandler.handle(update);
 
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
@@ -173,7 +173,7 @@ public class CreateUserHandlerTestTest extends RegisteredUserHandlerTest {
         update.setMessage(message);
 
         when(client.getUserByUsername(any(GetUserRequest.class))).thenReturn(null);
-        List<BotApiMethod<?>> botApiMethod = createUserHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createUserHandler.handle(update);
 
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 
@@ -261,7 +261,7 @@ public class CreateUserHandlerTestTest extends RegisteredUserHandlerTest {
 
         when(client.getUserByUsername(any(GetUserRequest.class))).thenReturn(response);
 
-        List<BotApiMethod<?>> botApiMethod = createUserHandler.handle(update);
+        List<PartialBotApiMethod<?>> botApiMethod = createUserHandler.handle(update);
 
         assertInstanceOf(SendMessage.class, botApiMethod.get(0));
 

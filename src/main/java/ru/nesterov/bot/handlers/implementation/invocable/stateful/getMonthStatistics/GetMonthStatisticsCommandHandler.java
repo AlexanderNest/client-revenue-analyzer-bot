@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.getMonthStati
 
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -66,7 +66,7 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> sendMonthStatistics(Update update) {
+    private List<PartialBotApiMethod<?>> sendMonthStatistics(Update update) {
         long userId = update.getCallbackQuery().getFrom().getId();
         CallbackQuery callbackQuery = update.getCallbackQuery();
         ButtonCallback callback = objectMapper.readValue(callbackQuery.getData(), ButtonCallback.class);
@@ -82,7 +82,7 @@ public class GetMonthStatisticsCommandHandler extends StatefulCommandHandler<Sta
     }
 
     @SneakyThrows
-    private List<BotApiMethod<?>> sendMonthKeyboard(Update update) {
+    private List<PartialBotApiMethod<?>> sendMonthKeyboard(Update update) {
         SendMessage message = new SendMessage();
         message.setChatId(String.valueOf(TelegramUpdateUtils.getChatId(update)));
         message.setText("Выберите месяц для анализа дохода:");

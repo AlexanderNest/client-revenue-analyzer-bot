@@ -3,7 +3,7 @@ package ru.nesterov.bot.handlers.statemachine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.statemachine.StateMachine;
@@ -24,7 +24,7 @@ public class StateMachineTest {
 
     @Test
     void test() {
-        Function<Update, List<BotApiMethod<?>>> functionForTransition = update -> List.of(new SendMessage("1", "Текст"));
+        Function<Update, List<PartialBotApiMethod<?>>> functionForTransition = update -> List.of(new SendMessage("1", "Текст"));
         stateMachine.addTransition(StateTest.STARTED, Action.COMMAND_INPUT, StateTest.WAITING_INPUT, functionForTransition);
         Assertions.assertEquals(StateTest.STARTED, stateMachine.getCurrentState());
 
@@ -32,7 +32,7 @@ public class StateMachineTest {
         Assertions.assertNotNull(nextStateFunction);
         Assertions.assertEquals(StateTest.WAITING_INPUT, nextStateFunction.getState());
 
-        List<BotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
+        List<PartialBotApiMethod<?>> response = nextStateFunction.getFunctionForTransition().apply(null);
         Assertions.assertInstanceOf(SendMessage.class, response.get(0));
         Assertions.assertEquals("Текст", ((SendMessage) response.get(0)).getText());
 

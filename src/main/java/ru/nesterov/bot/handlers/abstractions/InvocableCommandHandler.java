@@ -1,22 +1,18 @@
 package ru.nesterov.bot.handlers.abstractions;
 
 import org.springframework.core.Ordered;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import ru.nesterov.bot.dto.GetActiveClientResponse;
-import ru.nesterov.bot.dto.GetUserRequest;
-import ru.nesterov.bot.dto.GetUserResponse;
 import ru.nesterov.bot.dto.Role;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
 import ru.nesterov.bot.utils.TelegramUpdateUtils;
 
-
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -32,7 +28,7 @@ public abstract class InvocableCommandHandler extends SendingMessageCommandHandl
         return List.of(Role.USER);
     }
 
-    public List<BotApiMethod<?>> getClientNamesKeyboard(Update update, String text) {
+    public List<PartialBotApiMethod<?>> getClientNamesKeyboard(Update update, String text) {
         List<GetActiveClientResponse> clients = client.getActiveClients(TelegramUpdateUtils.getUserId(update));
         if (clients.isEmpty()) {
             return getPlainSendMessage(TelegramUpdateUtils.getChatId(update), "Нет доступных клиентов");
@@ -59,7 +55,7 @@ public abstract class InvocableCommandHandler extends SendingMessageCommandHandl
      * @param values - названия кнопок по порядку
      * @return - список из клиентов в виде inline keyboard
      */
-    public List<BotApiMethod<?>> getOneColumnInlineKeyboard(List<String> values, Update update, String text) {
+    public List<PartialBotApiMethod<?>> getOneColumnInlineKeyboard(List<String> values, Update update, String text) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();
 
@@ -80,7 +76,7 @@ public abstract class InvocableCommandHandler extends SendingMessageCommandHandl
         return getReplyKeyboard(TelegramUpdateUtils.getChatId(update), text, keyboardMarkup);
     }
 
-    public List<BotApiMethod<?>> editCurrentApproveKeyboardMessage(Update update, String message) {
+    public List<PartialBotApiMethod<?>> editCurrentApproveKeyboardMessage(Update update, String message) {
         return editMessage(
                 TelegramUpdateUtils.getChatId(update),
                 TelegramUpdateUtils.getMessageId(update),
@@ -89,7 +85,7 @@ public abstract class InvocableCommandHandler extends SendingMessageCommandHandl
         );
     }
 
-    public List<BotApiMethod<?>> getApproveKeyBoardMessage(Update update, String message) {
+    public List<PartialBotApiMethod<?>> getApproveKeyBoardMessage(Update update, String message) {
         return getReplyKeyboard(TelegramUpdateUtils.getChatId(update), message, getApproveKeyboard());
     }
 

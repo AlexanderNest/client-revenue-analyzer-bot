@@ -2,7 +2,7 @@ package ru.nesterov.bot.handlers.abstractions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import ru.nesterov.bot.exception.UserFriendlyException;
@@ -74,7 +74,7 @@ public abstract class StatefulCommandHandler<STATE extends Enum<STATE>, MEMORY> 
     }
 
     @Override
-    public List<BotApiMethod<?>> handle(Update update) {
+    public List<PartialBotApiMethod<?>> handle(Update update) {
         StateMachine<STATE, Action, MEMORY> stateMachine = getStateMachine(update);
         List<Action> expectedActions = stateMachine.getExpectedActions();
         Action action = actionService.defineTheAction(getCommand(), update, expectedActions);
@@ -88,7 +88,7 @@ public abstract class StatefulCommandHandler<STATE extends Enum<STATE>, MEMORY> 
             );
         }
 
-        List<BotApiMethod<?>> botApiMethod;
+        List<PartialBotApiMethod<?>> botApiMethod;
         try {
             botApiMethod = nextStateFunction.getFunctionForTransition().apply(update);
         } catch (UserFriendlyException ex) {
