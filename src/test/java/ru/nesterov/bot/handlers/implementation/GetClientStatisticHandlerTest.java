@@ -95,6 +95,7 @@ public class GetClientStatisticHandlerTest extends RegisteredUserHandlerTest {
         client1.setSuccessfulEventsCount(10);
         client1.setPlannedCancelledEventsCount(1);
         client1.setNotPlannedCancelledEventsCount(1);
+        client1.setPromoEventsCount(1);
         client1.setTotalIncome(5000);
 
         when(client.getClientStatistic(anyLong(), eq("Клиент 1"))).thenReturn(client1);
@@ -124,6 +125,7 @@ public class GetClientStatisticHandlerTest extends RegisteredUserHandlerTest {
                         "Состоявшиеся занятия: 10\n" +
                         "Запланированные отмены: 1\n" +
                         "Незапланированные отмены: 1\n" +
+                        "Промо встречи: 1\n" +
                         "─────────────────────────────\n" +
                         "Суммарный доход: 5\u00A0000 ₽\n";
 
