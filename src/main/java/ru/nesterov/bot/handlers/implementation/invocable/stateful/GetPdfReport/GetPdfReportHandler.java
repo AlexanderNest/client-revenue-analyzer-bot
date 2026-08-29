@@ -3,6 +3,7 @@ package ru.nesterov.bot.handlers.implementation.invocable.stateful.GetPdfReport;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import ru.nesterov.bot.exception.UserFriendlyException;
 import ru.nesterov.bot.handlers.abstractions.StatefulCommandHandler;
 import ru.nesterov.bot.handlers.callback.ButtonCallback;
 import ru.nesterov.bot.handlers.implementation.invocable.stateful.getSchedule.InlineCalendarBuilder;
@@ -21,6 +22,8 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
 
     private static final String ENTER_FIRST_DATE = "Введите первую дату";
     private static final String ENTER_SECOND_DATE = "Введите вторую дату";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private static final DateTimeFormatter FILE_NAME_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy_HH-mm");
     private final InlineCalendarBuilder inlineCalendarBuilder;
 
     public GetPdfReportHandler(InlineCalendarBuilder inlineCalendarBuilder) {
@@ -75,9 +78,17 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
 
     private List<PartialBotApiMethod<?>> handleSecondDateAndSendPdfReport(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
-        getStateMachine(update).getMemory().setSecondDate(LocalDate.parse(buttonCallback.getValue()).plusDays(1));
-
         GetPdfReportRequest memory = getStateMachine(update).getMemory();
+
+        LocalDate selectedDate = LocalDate.parse(buttonCallback.getValue());
+        if (selectedDate.isBefore(memory.getFirstDate())) {
+            throw new UserFriendlyException(
+                    "Вторая дата не может быть раньше первой (%s). Выберите дату еще раз"
+                            .formatted(memory.getFirstDate().format(DATE_FORMATTER))
+            );
+        }
+        memory.setSecondDate(selectedDate.plusDays(1));
+
         long chatId = TelegramUpdateUtils.getChatId(update);
 
         InputStream inputStream = client.getClientPdfReportInputStream(
@@ -89,12 +100,12 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
 
         String fileName = "report_%s_%s.pdf".formatted(
                 memory.getClientName(),
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy_HH-mm"))
+                LocalDateTime.now().format(FILE_NAME_DATE_FORMATTER)
         );
 
         List<PartialBotApiMethod<?>> messages = new ArrayList<>();
+        messages.addAll(editMessage(chatId, TelegramUpdateUtils.getMessageId(update), "PDF-отчет отправлен", null));
         messages.addAll(buildSendDocument(chatId, inputStream, fileName));
-        messages.addAll(getPlainSendMessage(chatId, "PDF-отчёт отправлен"));
 
         return messages;
     }

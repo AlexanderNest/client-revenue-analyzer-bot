@@ -32,3 +32,4 @@ bin/
 /client-revenue-analyzer-bot.iml
 /target/
 /.idea/
+/.claude/
