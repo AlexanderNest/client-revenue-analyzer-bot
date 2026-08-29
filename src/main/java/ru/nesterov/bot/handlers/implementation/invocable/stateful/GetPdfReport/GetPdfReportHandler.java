@@ -51,7 +51,6 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         return "Сформировать PDF-отчет";
     }
 
-
     private List<PartialBotApiMethod<?>> handleCallbackPrev(Update update) {
         LocalDate displayedMonth = getStateMachine(update).getMemory().getDisplayedMonth().minusMonths(1);
         getStateMachine(update).getMemory().setDisplayedMonth(displayedMonth);
@@ -67,14 +66,12 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         return sendCalendarKeyBoard(update, ENTER_FIRST_DATE, getStateMachine(update).getMemory().getDisplayedMonth());
     }
 
-
     private List<PartialBotApiMethod<?>> handleFirstDateAndSendSecondDateInput(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
 
         getStateMachine(update).getMemory().setFirstDate(LocalDate.parse(buttonCallback.getValue()));
         return sendCalendarKeyBoard(update, ENTER_SECOND_DATE, getStateMachine(update).getMemory().getFirstDate());
     }
-
 
     private List<PartialBotApiMethod<?>> handleSecondDateAndSendPdfReport(Update update) {
         ButtonCallback buttonCallback = buttonCallbackService.buildButtonCallback(update.getCallbackQuery().getData());
@@ -102,7 +99,6 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         return messages;
     }
 
-
     private List<PartialBotApiMethod<?>> sendCalendarKeyBoard(Update update, String text, LocalDate date) {
         return editMessage(TelegramUpdateUtils.getChatId(update),
                 TelegramUpdateUtils.getMessageId(update),
@@ -111,18 +107,15 @@ public class GetPdfReportHandler extends StatefulCommandHandler<State, GetPdfRep
         );
     }
 
-
     private List<PartialBotApiMethod<?>> handleCommandInputAndSendClients(Update update) {
         return getClientNamesKeyboard(update, "Выберите клиента, для которого хотите получить PDF-отчет:");
     }
-
 
     private List<PartialBotApiMethod<?>> handleCallbackToday(Update update) {
         LocalDate today = LocalDate.now();
         getStateMachine(update).getMemory().setDisplayedMonth(today.withDayOfMonth(1));
         return handleMonthSwitch(update);
     }
-
 
     private List<PartialBotApiMethod<?>> handleCallbackNext(Update update) {
         LocalDate displayedMonth = getStateMachine(update).getMemory().getDisplayedMonth().plusMonths(1);
