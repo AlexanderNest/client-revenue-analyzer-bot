@@ -74,6 +74,7 @@ public class GetClientStatisticHandler extends StatefulCommandHandler<State, NoM
         String successfulEvents = String.format("%s", currencyFormat.format(response.getSuccessfulEventsCount()));
         String plannedCancelled = String.format("%s", currencyFormat.format(response.getPlannedCancelledEventsCount()));
         String notPlannedCancelled = String.format("%s", currencyFormat.format(response.getNotPlannedCancelledEventsCount()));
+        String promoEvents = String.format("%s", currencyFormat.format(response.getPromoEventsCount()));
         String totalIncome = String.format("%s ₽", currencyFormat.format(response.getTotalIncome()));
 
         return "📊 *Статистика клиента*\n\n" +
@@ -91,6 +92,7 @@ public class GetClientStatisticHandler extends StatefulCommandHandler<State, NoM
                 String.format("%s %s", "Состоявшиеся занятия:", successfulEvents) + "\n" +
                 String.format("%s %s", "Запланированные отмены:", plannedCancelled) + "\n" +
                 String.format("%s %s", "Незапланированные отмены:", notPlannedCancelled) + "\n" +
+                String.format("%s %s", "Промо встречи:", promoEvents) + "\n" +
                 "─────────────────────────────" + "\n" +
                 String.format("%s %s", "Суммарный доход:", totalIncome) + "\n";
     }
