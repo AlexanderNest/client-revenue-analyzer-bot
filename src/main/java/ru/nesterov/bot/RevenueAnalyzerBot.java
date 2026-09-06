@@ -47,7 +47,7 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         executorService.execute(() -> handleUpdate(update));
     }
 
-    public void handleUpdate(Update update) {
+    private void handleUpdate(Update update) {
         log.debug("Получен update с содержимым: {}", update);
 
         long chatId = TelegramUpdateUtils.getChatId(update);
@@ -95,7 +95,7 @@ public class RevenueAnalyzerBot extends TelegramLongPollingBot {
         return List.of(message);
     }
 
-    private void sendMessage(List<PartialBotApiMethod<?>> sendMessages) {
+    public void sendMessage(List<PartialBotApiMethod<?>> sendMessages) {
         for (PartialBotApiMethod<?> message : sendMessages) {
             try {
                 log.debug("Отправка сообщения с содержимым: {}", message);
